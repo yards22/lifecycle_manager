@@ -22,6 +22,7 @@ func main() {
 	db, err := initDB()
 	if err != nil {
 		l.Fatal("Error: Cannot initialize database", err)
+		return
 	}
 
 	app := &App{

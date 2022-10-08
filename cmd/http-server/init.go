@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
 	"github.com/yards22/lcmanager/internal/token_manager"
 	"github.com/yards22/lcmanager/pkg/env"
