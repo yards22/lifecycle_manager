@@ -2,8 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
 	"github.com/yards22/lcmanager/internal/token_manager"
@@ -19,8 +21,17 @@ func initDB() (*sql.DB, error) {
 }
 
 func initManagers(app *App) {
-	// Initialize managers
+	// Initialize managers and add to app
 	tokenManager := token_manager.New(sqlc.New(app.db), time.Hour)
-	// Add to app
 	app.managers["tokenManager"] = tokenManager
+}
+
+func initServer(app *App) {
+	r := chi.NewRouter()
+
+	srv := http.Server{
+		Addr:    env.ViperGetEnvVar("SERVER_ADDR"),
+		Handler: r,
+	}
+	app.srv = &srv
 }
