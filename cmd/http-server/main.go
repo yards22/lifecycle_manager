@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/yards22/lcmanager/internal/manager"
@@ -12,6 +13,7 @@ type App struct {
 	db       *sql.DB
 	logger   *log.Logger
 	managers map[string]manager.Manager
+	srv      *http.Server
 }
 
 var (
@@ -32,8 +34,10 @@ func main() {
 	}
 
 	initManagers(app)
-
 	for _, v := range app.managers {
 		go v.Run()
 	}
+
+	initServer(app)
+	app.logger.Fatalln(app.srv.ListenAndServe())
 }
