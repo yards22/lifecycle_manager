@@ -44,6 +44,7 @@ CREATE TABLE `networks` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `follower_id` INTEGER NOT NULL,
     `following_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `networks_follower_id_following_id_key`(`follower_id`, `following_id`),
     PRIMARY KEY (`id`)
@@ -204,4 +205,4 @@ ALTER TABLE `user_recommendations` ADD CONSTRAINT `user_recommendations_user_id_
 ALTER TABLE `trending_posts` ADD CONSTRAINT `trending_posts_post_id_fkey` FOREIGN KEY (`post_id`) REFERENCES `posts`(`post_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `tending_users` ADD CONSTRAINT `tending_users_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `trending_users` ADD CONSTRAINT `trending_users_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -10,7 +10,7 @@ import (
 )
 
 const commentTrendingUsers = `-- name: CommentTrendingUsers :many
-SELECT user_id,COUNT(user_id) as comment_count from parent_comments 
+SELECT user_id,COUNT(post_id) as comment_count from parent_comments 
 WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 DAY) 
 GROUP BY user_id
 `
@@ -53,7 +53,7 @@ func (q *Queries) InsertTrendingUsers(ctx context.Context, userID int32) error {
 }
 
 const likeTrendingUsers = `-- name: LikeTrendingUsers :many
-SELECT user_id,COUNT(user_id) as like_count from likes
+SELECT user_id,COUNT(post_id) as like_count from likes
 WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 DAY) 
 GROUP BY user_id
 `

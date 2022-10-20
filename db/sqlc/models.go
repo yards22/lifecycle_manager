@@ -52,9 +52,10 @@ type Like struct {
 }
 
 type Network struct {
-	ID          int64 `json:"id"`
-	FollowerID  int32 `json:"follower_id"`
-	FollowingID int32 `json:"following_id"`
+	ID          int64     `json:"id"`
+	FollowerID  int32     `json:"follower_id"`
+	FollowingID int32     `json:"following_id"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type Notification struct {

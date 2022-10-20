@@ -33,6 +33,39 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteExpiredTokensStmt, err = db.PrepareContext(ctx, deleteExpiredTokens); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteExpiredTokens: %w", err)
 	}
+	if q.getFollowersCountStmt, err = db.PrepareContext(ctx, getFollowersCount); err != nil {
+		return nil, fmt.Errorf("error preparing query GetFollowersCount: %w", err)
+	}
+	if q.getFollowingStmt, err = db.PrepareContext(ctx, getFollowing); err != nil {
+		return nil, fmt.Errorf("error preparing query GetFollowing: %w", err)
+	}
+	if q.getFollowingIdsStmt, err = db.PrepareContext(ctx, getFollowingIds); err != nil {
+		return nil, fmt.Errorf("error preparing query GetFollowingIds: %w", err)
+	}
+	if q.getFollowingReactionStmt, err = db.PrepareContext(ctx, getFollowingReaction); err != nil {
+		return nil, fmt.Errorf("error preparing query GetFollowingReaction: %w", err)
+	}
+	if q.getFollwersStmt, err = db.PrepareContext(ctx, getFollwers); err != nil {
+		return nil, fmt.Errorf("error preparing query GetFollwers: %w", err)
+	}
+	if q.getMutualStmt, err = db.PrepareContext(ctx, getMutual); err != nil {
+		return nil, fmt.Errorf("error preparing query GetMutual: %w", err)
+	}
+	if q.getPostsStmt, err = db.PrepareContext(ctx, getPosts); err != nil {
+		return nil, fmt.Errorf("error preparing query GetPosts: %w", err)
+	}
+	if q.getRatingStmt, err = db.PrepareContext(ctx, getRating); err != nil {
+		return nil, fmt.Errorf("error preparing query GetRating: %w", err)
+	}
+	if q.getUserCommentsStmt, err = db.PrepareContext(ctx, getUserComments); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserComments: %w", err)
+	}
+	if q.getUserLikesStmt, err = db.PrepareContext(ctx, getUserLikes); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserLikes: %w", err)
+	}
+	if q.getUsersStmt, err = db.PrepareContext(ctx, getUsers); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUsers: %w", err)
+	}
 	if q.insertTrendingStmt, err = db.PrepareContext(ctx, insertTrending); err != nil {
 		return nil, fmt.Errorf("error preparing query InsertTrending: %w", err)
 	}
@@ -44,6 +77,15 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.likeTrendingUsersStmt, err = db.PrepareContext(ctx, likeTrendingUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query LikeTrendingUsers: %w", err)
+	}
+	if q.updateRatingStmt, err = db.PrepareContext(ctx, updateRating); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateRating: %w", err)
+	}
+	if q.upsertPostRecommendationsStmt, err = db.PrepareContext(ctx, upsertPostRecommendations); err != nil {
+		return nil, fmt.Errorf("error preparing query UpsertPostRecommendations: %w", err)
+	}
+	if q.upsertUserRecommendationsStmt, err = db.PrepareContext(ctx, upsertUserRecommendations); err != nil {
+		return nil, fmt.Errorf("error preparing query UpsertUserRecommendations: %w", err)
 	}
 	return &q, nil
 }
@@ -65,6 +107,61 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteExpiredTokensStmt: %w", cerr)
 		}
 	}
+	if q.getFollowersCountStmt != nil {
+		if cerr := q.getFollowersCountStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getFollowersCountStmt: %w", cerr)
+		}
+	}
+	if q.getFollowingStmt != nil {
+		if cerr := q.getFollowingStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getFollowingStmt: %w", cerr)
+		}
+	}
+	if q.getFollowingIdsStmt != nil {
+		if cerr := q.getFollowingIdsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getFollowingIdsStmt: %w", cerr)
+		}
+	}
+	if q.getFollowingReactionStmt != nil {
+		if cerr := q.getFollowingReactionStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getFollowingReactionStmt: %w", cerr)
+		}
+	}
+	if q.getFollwersStmt != nil {
+		if cerr := q.getFollwersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getFollwersStmt: %w", cerr)
+		}
+	}
+	if q.getMutualStmt != nil {
+		if cerr := q.getMutualStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getMutualStmt: %w", cerr)
+		}
+	}
+	if q.getPostsStmt != nil {
+		if cerr := q.getPostsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getPostsStmt: %w", cerr)
+		}
+	}
+	if q.getRatingStmt != nil {
+		if cerr := q.getRatingStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getRatingStmt: %w", cerr)
+		}
+	}
+	if q.getUserCommentsStmt != nil {
+		if cerr := q.getUserCommentsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserCommentsStmt: %w", cerr)
+		}
+	}
+	if q.getUserLikesStmt != nil {
+		if cerr := q.getUserLikesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserLikesStmt: %w", cerr)
+		}
+	}
+	if q.getUsersStmt != nil {
+		if cerr := q.getUsersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUsersStmt: %w", cerr)
+		}
+	}
 	if q.insertTrendingStmt != nil {
 		if cerr := q.insertTrendingStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing insertTrendingStmt: %w", cerr)
@@ -83,6 +180,21 @@ func (q *Queries) Close() error {
 	if q.likeTrendingUsersStmt != nil {
 		if cerr := q.likeTrendingUsersStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing likeTrendingUsersStmt: %w", cerr)
+		}
+	}
+	if q.updateRatingStmt != nil {
+		if cerr := q.updateRatingStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateRatingStmt: %w", cerr)
+		}
+	}
+	if q.upsertPostRecommendationsStmt != nil {
+		if cerr := q.upsertPostRecommendationsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing upsertPostRecommendationsStmt: %w", cerr)
+		}
+	}
+	if q.upsertUserRecommendationsStmt != nil {
+		if cerr := q.upsertUserRecommendationsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing upsertUserRecommendationsStmt: %w", cerr)
 		}
 	}
 	return err
@@ -122,27 +234,55 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                       DBTX
-	tx                       *sql.Tx
-	commentTrendingStmt      *sql.Stmt
-	commentTrendingUsersStmt *sql.Stmt
-	deleteExpiredTokensStmt  *sql.Stmt
-	insertTrendingStmt       *sql.Stmt
-	insertTrendingUsersStmt  *sql.Stmt
-	likeTrendingStmt         *sql.Stmt
-	likeTrendingUsersStmt    *sql.Stmt
+	db                            DBTX
+	tx                            *sql.Tx
+	commentTrendingStmt           *sql.Stmt
+	commentTrendingUsersStmt      *sql.Stmt
+	deleteExpiredTokensStmt       *sql.Stmt
+	getFollowersCountStmt         *sql.Stmt
+	getFollowingStmt              *sql.Stmt
+	getFollowingIdsStmt           *sql.Stmt
+	getFollowingReactionStmt      *sql.Stmt
+	getFollwersStmt               *sql.Stmt
+	getMutualStmt                 *sql.Stmt
+	getPostsStmt                  *sql.Stmt
+	getRatingStmt                 *sql.Stmt
+	getUserCommentsStmt           *sql.Stmt
+	getUserLikesStmt              *sql.Stmt
+	getUsersStmt                  *sql.Stmt
+	insertTrendingStmt            *sql.Stmt
+	insertTrendingUsersStmt       *sql.Stmt
+	likeTrendingStmt              *sql.Stmt
+	likeTrendingUsersStmt         *sql.Stmt
+	updateRatingStmt              *sql.Stmt
+	upsertPostRecommendationsStmt *sql.Stmt
+	upsertUserRecommendationsStmt *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                       tx,
-		tx:                       tx,
-		commentTrendingStmt:      q.commentTrendingStmt,
-		commentTrendingUsersStmt: q.commentTrendingUsersStmt,
-		deleteExpiredTokensStmt:  q.deleteExpiredTokensStmt,
-		insertTrendingStmt:       q.insertTrendingStmt,
-		insertTrendingUsersStmt:  q.insertTrendingUsersStmt,
-		likeTrendingStmt:         q.likeTrendingStmt,
-		likeTrendingUsersStmt:    q.likeTrendingUsersStmt,
+		db:                            tx,
+		tx:                            tx,
+		commentTrendingStmt:           q.commentTrendingStmt,
+		commentTrendingUsersStmt:      q.commentTrendingUsersStmt,
+		deleteExpiredTokensStmt:       q.deleteExpiredTokensStmt,
+		getFollowersCountStmt:         q.getFollowersCountStmt,
+		getFollowingStmt:              q.getFollowingStmt,
+		getFollowingIdsStmt:           q.getFollowingIdsStmt,
+		getFollowingReactionStmt:      q.getFollowingReactionStmt,
+		getFollwersStmt:               q.getFollwersStmt,
+		getMutualStmt:                 q.getMutualStmt,
+		getPostsStmt:                  q.getPostsStmt,
+		getRatingStmt:                 q.getRatingStmt,
+		getUserCommentsStmt:           q.getUserCommentsStmt,
+		getUserLikesStmt:              q.getUserLikesStmt,
+		getUsersStmt:                  q.getUsersStmt,
+		insertTrendingStmt:            q.insertTrendingStmt,
+		insertTrendingUsersStmt:       q.insertTrendingUsersStmt,
+		likeTrendingStmt:              q.likeTrendingStmt,
+		likeTrendingUsersStmt:         q.likeTrendingUsersStmt,
+		updateRatingStmt:              q.updateRatingStmt,
+		upsertPostRecommendationsStmt: q.upsertPostRecommendationsStmt,
+		upsertUserRecommendationsStmt: q.upsertUserRecommendationsStmt,
 	}
 }
