@@ -7,7 +7,7 @@ import (
 )
 
 func ViperGetEnvVar(key string) string {
-	viper.SetConfigFile("../../.env")
+	viper.SetConfigFile(".env")
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatalf("Error while reading config file %s", err)
