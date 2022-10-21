@@ -35,12 +35,6 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 
 	fmt.Println(usersCount)
 
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	// score changes because of Posts...
-
 	proportions := Categories{
 		posts:             35,
 		started_following: 5,
@@ -54,6 +48,12 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 		added_followers:   15,
 		reactions:         2,
 	}
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// score changes because of Posts...
 
 	posts, err := rm.querier.GetPosts(ctx)
 
@@ -144,6 +144,8 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	// Rating Updation ....
 
 	for user := 1; user <= int(usersCount); user++ {
 

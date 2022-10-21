@@ -38,8 +38,11 @@ func (q *Queries) GetFollowingIds(ctx context.Context, followerID int32) ([]int3
 }
 
 const getMutual = `-- name: GetMutual :many
-SELECT following_id from networks  
-WHERE follower_id  IN (?)
+SELECT n1.following_id from networks as n1  
+WHERE n1.follower_id  IN (
+ SELECT n2.following_id from networks as n2
+ WHERE n2.follower_id  = (?)
+)
 `
 
 func (q *Queries) GetMutual(ctx context.Context, followerID int32) ([]int32, error) {

@@ -35,8 +35,6 @@ func (rum *RUManager) GenerateRecommendedUsers(ctx context.Context) {
 
 	for user := 1; user <= int(usersCount); user++ {
 
-		// following,err := rum.querier.GetFollowingIds(ctx,int32(user))
-
 		mutuals_id, err := rum.querier.GetMutual(ctx, int32(user))
 
 		if err != nil {
