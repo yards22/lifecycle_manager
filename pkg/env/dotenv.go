@@ -2,12 +2,14 @@ package env
 
 import (
 	"log"
+	"path/filepath"
 
 	"github.com/spf13/viper"
 )
 
 func ViperGetEnvVar(key string) string {
-	viper.SetConfigFile(".env")
+	envPath := filepath.Join(".env")
+	viper.SetConfigFile(envPath)
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatalf("Error while reading config file %s", err)
