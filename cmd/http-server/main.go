@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"os"
 
+	sqlc "github.com/yards22/lcmanager/db/sqlc"
 	"github.com/yards22/lcmanager/internal/manager"
 )
 
 type App struct {
 	db       *sql.DB
+	store    *sqlc.Queries
 	logger   *log.Logger
 	managers map[string]manager.Manager
 	srv      *http.Server
@@ -29,6 +31,7 @@ func main() {
 
 	app := &App{
 		db:       db,
+		store:    sqlc.New(db),
 		logger:   l,
 		managers: make(map[string]manager.Manager),
 	}
