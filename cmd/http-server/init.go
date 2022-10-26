@@ -26,7 +26,7 @@ func getDuration(i json.RunnerInterval) time.Duration {
 }
 
 func initManagers(app *App) {
-	managerConfigs, err := json.New("manspec.json")
+	managerConfigs, err := json.New("internal/manager/manspec.json")
 	if err != nil {
 		app.logger.Fatalln(err.Error())
 	}

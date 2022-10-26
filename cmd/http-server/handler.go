@@ -21,6 +21,7 @@ func handler(app *App, r *chi.Mux) {
 			return
 		}
 		app.managers[name].Close()
+		sendResponse(rw, http.StatusOK, nil, "Success: Close "+name)
 	})
 
 	r.Post("/{name}/start", func(rw http.ResponseWriter, r *http.Request) {
@@ -30,5 +31,6 @@ func handler(app *App, r *chi.Mux) {
 			return
 		}
 		go app.managers[name].Run()
+		sendResponse(rw, http.StatusOK, nil, "Success: Run "+name)
 	})
 }

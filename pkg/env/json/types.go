@@ -9,5 +9,5 @@ type RunnerInterval struct {
 }
 
 type ManagerConfigs struct {
-	Interval RunnerInterval
+	Interval RunnerInterval `json:"interval"`
 }
