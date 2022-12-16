@@ -1,2 +1,3 @@
 .env
 internal/manager/*.json
+build/

@@ -46,7 +46,7 @@ func initManagers(app *App) {
 
 func initServer(app *App) {
 	r := chi.NewRouter()
-
+	handler(r)
 	srv := http.Server{
 		Addr:    env.ViperGetEnvVar("SERVER_ADDR"),
 		Handler: r,

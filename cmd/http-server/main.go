@@ -41,5 +41,6 @@ func main() {
 	}
 
 	initServer(app)
+	app.logger.Println("starting server...")
 	app.logger.Fatalln(app.srv.ListenAndServe())
 }
