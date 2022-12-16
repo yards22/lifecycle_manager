@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -24,6 +25,7 @@ func initDB() (*sql.DB, error) {
 
 func initManagers(app *App) {
 	// Initialize managers and add to app
+	fmt.Println("in initManager func")
 	tokenManager := token_manager.New(sqlc.New(app.db), time.Hour)
 	app.managers["tokenManager"] = tokenManager
 	trendingPostsManager := t_posts_manager.New(sqlc.New(app.db), 24*(time.Hour))

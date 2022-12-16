@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -21,6 +22,7 @@ var (
 )
 
 func main() {
+	fmt.Println("main.go, 1")
 	db, err := initDB()
 	if err != nil {
 		l.Fatal("Error: Cannot initialize database", err)
