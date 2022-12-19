@@ -44,6 +44,13 @@ type Favourite struct {
 	PostID int64 `json:"post_id"`
 }
 
+type Feedback struct {
+	FeedbackID int64          `json:"feedback_id"`
+	UserID     int32          `json:"user_id"`
+	ImageUri   sql.NullString `json:"image_uri"`
+	Content    sql.NullString `json:"content"`
+}
+
 type Like struct {
 	UserID    int32     `json:"user_id"`
 	PostID    int64     `json:"post_id"`
@@ -72,6 +79,21 @@ type ParentComment struct {
 	PostID    int64     `json:"post_id"`
 	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type Poll struct {
+	PollID       int32     `json:"poll_id"`
+	PollBy       string    `json:"poll_by"`
+	PollQuestion string    `json:"poll_question"`
+	OptionsCount int32     `json:"options_count"`
+	Options      string    `json:"options"`
+	CreatedAt    time.Time `json:"created_at"`
+}
+
+type PollsReaction struct {
+	PollID int32 `json:"poll_id"`
+	UserID int32 `json:"user_id"`
+	Type   int32 `json:"type"`
 }
 
 type Post struct {

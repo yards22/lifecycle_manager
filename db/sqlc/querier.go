@@ -11,13 +11,16 @@ import (
 type Querier interface {
 	CommentTrending(ctx context.Context) ([]*CommentTrendingRow, error)
 	CommentTrendingUsers(ctx context.Context) ([]*CommentTrendingUsersRow, error)
+	CreatePolls(ctx context.Context, arg CreatePollsParams) error
 	DeleteExpiredTokens(ctx context.Context) error
+	GetFeedback(ctx context.Context) ([]*Feedback, error)
 	GetFollowersCount(ctx context.Context) ([]int32, error)
 	GetFollowing(ctx context.Context) ([]*GetFollowingRow, error)
 	GetFollowingIds(ctx context.Context, followerID int32) ([]int32, error)
 	GetFollowingReaction(ctx context.Context, followerID int32) ([]int64, error)
 	GetFollwers(ctx context.Context) ([]*GetFollwersRow, error)
 	GetMutual(ctx context.Context, followerID int32) ([]int32, error)
+	GetPolls(ctx context.Context) ([]*Poll, error)
 	GetPosts(ctx context.Context) ([]*GetPostsRow, error)
 	GetRating(ctx context.Context, userID int32) (int32, error)
 	GetUserComments(ctx context.Context) ([]*GetUserCommentsRow, error)
