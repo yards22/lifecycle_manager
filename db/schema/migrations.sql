@@ -127,11 +127,11 @@ CREATE TABLE `postRecommendations` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `user_recommendations` (
+CREATE TABLE `trending_users` (
+    `tu_id` BIGINT NOT NULL AUTO_INCREMENT,
     `user_id` INTEGER NOT NULL,
-    `recommend` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `user_recommendations_user_id_key`(`user_id`)
+    PRIMARY KEY (`tu_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -143,11 +143,42 @@ CREATE TABLE `trending_posts` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `trending_users` (
-    `tu_id` BIGINT NOT NULL AUTO_INCREMENT,
+CREATE TABLE `user_recommendations` (
     `user_id` INTEGER NOT NULL,
+    `recommend` VARCHAR(191) NOT NULL,
 
-    PRIMARY KEY (`tu_id`)
+    UNIQUE INDEX `user_recommendations_user_id_key`(`user_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `feedback` (
+    `feedback_id` BIGINT NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL,
+    `image_uri` VARCHAR(191) NULL,
+    `content` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`feedback_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `polls` (
+    `poll_id` INTEGER NOT NULL AUTO_INCREMENT,
+    `poll_by` VARCHAR(191) NOT NULL DEFAULT 'Admin',
+    `poll_question` VARCHAR(191)NOT NULL,
+    `options_count` INTEGER NOT NULL,
+    `options` VARCHAR(191) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`poll_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `polls_reaction` (
+    `poll_id` INTEGER NOT NULL,
+    `user_id` INTEGER NOT NULL,
+    `type` INTEGER NOT NULL,
+
+    UNIQUE INDEX `polls_reaction_poll_id_user_id_key`(`poll_id`, `user_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
@@ -199,10 +230,19 @@ ALTER TABLE `favourites` ADD CONSTRAINT `favourites_post_id_fkey` FOREIGN KEY (`
 ALTER TABLE `postRecommendations` ADD CONSTRAINT `postRecommendations_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `user_recommendations` ADD CONSTRAINT `user_recommendations_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `trending_users` ADD CONSTRAINT `trending_users_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `trending_posts` ADD CONSTRAINT `trending_posts_post_id_fkey` FOREIGN KEY (`post_id`) REFERENCES `posts`(`post_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `trending_users` ADD CONSTRAINT `trending_users_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `user_recommendations` ADD CONSTRAINT `user_recommendations_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `feedback` ADD CONSTRAINT `feedback_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `polls_reaction` ADD CONSTRAINT `polls_reaction_poll_id_fkey` FOREIGN KEY (`poll_id`) REFERENCES `polls`(`poll_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `polls_reaction` ADD CONSTRAINT `polls_reaction_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
