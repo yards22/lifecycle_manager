@@ -6,10 +6,10 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func handler(r *chi.Mux) {
-	r.Get("/web", func(rw http.ResponseWriter, r *http.Request) {
-		rw.Header().Set("Content-Type", "text/html; charset=utf-8")
-		http.ServeFile(rw, r, "./build/index.html")
-	})
-	r.Handle("/static/*", http.FileServer(http.Dir("./build")))
+func initHandler(app *App, r *chi.Mux) {
+	r.Post("/sendOTP", app.handleSendOTP)
+	r.Post("/login", app.handleLogin)
+	r.Post("/poll", http.HandlerFunc(app.handleCreatePoll))
+	r.Get("/poll", http.HandlerFunc(app.handleGetPoll))
+	r.Get("/feedback", http.HandlerFunc(app.handleGetFeedback))
 }

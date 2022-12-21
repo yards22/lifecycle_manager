@@ -164,7 +164,7 @@ CREATE TABLE `feedback` (
 CREATE TABLE `polls` (
     `poll_id` INTEGER NOT NULL AUTO_INCREMENT,
     `poll_by` VARCHAR(191) NOT NULL DEFAULT 'Admin',
-    `poll_question` VARCHAR(191)NOT NULL,
+    `poll_question` VARCHAR(191) NULL,
     `options_count` INTEGER NOT NULL,
     `options` VARCHAR(191) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -179,6 +179,14 @@ CREATE TABLE `polls_reaction` (
     `type` INTEGER NOT NULL,
 
     UNIQUE INDEX `polls_reaction_poll_id_user_id_key`(`poll_id`, `user_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `admin_users` (
+    `mail_id` VARCHAR(191) NOT NULL,
+    `open_to` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `admin_users_mail_id_key`(`mail_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey

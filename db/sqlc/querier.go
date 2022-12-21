@@ -13,6 +13,7 @@ type Querier interface {
 	CommentTrendingUsers(ctx context.Context) ([]*CommentTrendingUsersRow, error)
 	CreatePolls(ctx context.Context, arg CreatePollsParams) error
 	DeleteExpiredTokens(ctx context.Context) error
+	GetAdmin(ctx context.Context, mailID string) ([]*AdminUser, error)
 	GetFeedback(ctx context.Context) ([]*Feedback, error)
 	GetFollowersCount(ctx context.Context) ([]int32, error)
 	GetFollowing(ctx context.Context) ([]*GetFollowingRow, error)

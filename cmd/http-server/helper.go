@@ -5,12 +5,31 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 var (
 	ErrCouldNotReadBody  = errors.New("could not read body")
 	ErrCouldNotParseBody = errors.New("could not parse body")
 )
+
+func getCookie(r *http.Request, name string) (string, error) {
+	cookie, err := r.Cookie(name)
+	if err != nil {
+		return "", err
+	}
+	value := cookie.Value
+	return value, nil
+}
+
+func setCookie(rw http.ResponseWriter, expires time.Time, name, value string) {
+	http.SetCookie(rw, &http.Cookie{
+		Name:     name,
+		Value:    value,
+		Expires:  expires,
+		HttpOnly: true,
+	})
+}
 
 func getBody(r *http.Request, v interface{}) error {
 	body, err := ioutil.ReadAll(r.Body)

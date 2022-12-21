@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
+	authservice "github.com/yards22/lcmanager/internal/auth_service"
 	"github.com/yards22/lcmanager/internal/feedback_manager"
 	"github.com/yards22/lcmanager/internal/poll_manager"
 	"github.com/yards22/lcmanager/internal/r_manager"
@@ -17,7 +18,13 @@ import (
 	"github.com/yards22/lcmanager/internal/t_users_manager"
 	"github.com/yards22/lcmanager/internal/token_manager"
 	"github.com/yards22/lcmanager/pkg/env"
+	kvstore "github.com/yards22/lcmanager/pkg/kv_store"
 )
+
+type Author struct {
+	Name string `json:"name"`
+	Age  int    `json:"age"`
+}
 
 func initDB() (*sql.DB, error) {
 	db, err := sql.Open(env.ViperGetEnvVar("DB_DRIVER_NAME"), env.ViperGetEnvVar("DB_DATA_SOURCE_NAME"))
@@ -26,6 +33,24 @@ func initDB() (*sql.DB, error) {
 	}
 	return db, nil
 }
+
+// func initRedis() *redis.Client {
+// 	client := redis.NewClient(&redis.Options{
+// 		Addr:     "localhost:6379",
+// 		Password: "",
+// 		DB:       0,
+// 	})
+// 	// json, err := json.Marshal(Author{Name: "Elliot", Age: 25})
+// 	// if err != nil {
+// 	// 	fmt.Println(err)
+// 	// }
+
+// 	// err = client.Set("id1234", json, 0).Err()
+// 	// if err != nil {
+// 	// 	fmt.Println(err)
+// 	// }
+// 	return client
+// }
 
 func initRunnerManagers(app *App) {
 	// Initialize managers and add to app
@@ -39,7 +64,7 @@ func initRunnerManagers(app *App) {
 	app.managers["recommendedUsersManager"] = recommendedUsersManager
 	recommendedPostsManager := r_posts_manager.New(sqlc.New(app.db), 6*(time.Hour))
 	app.managers["recommendedUsersManager"] = recommendedPostsManager
-	ratingManager := r_manager.New(sqlc.New(app.db), time.Minute)
+	ratingManager := r_manager.New(sqlc.New(app.db), 12*(time.Hour))
 	app.managers["recommendedUsersManager"] = ratingManager
 }
 
@@ -53,10 +78,14 @@ func initManagers(app *App) {
 
 func initServer(app *App) {
 	r := chi.NewRouter()
-	handler(r)
+	initHandler(app, r)
 	srv := http.Server{
 		Addr:    env.ViperGetEnvVar("SERVER_ADDR"),
 		Handler: r,
 	}
 	app.srv = &srv
+}
+
+func initAuthService(app *App) {
+	app.authService = authservice.New(kvstore.New(), sqlc.New(app.db))
 }

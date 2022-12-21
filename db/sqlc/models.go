@@ -31,6 +31,11 @@ func (e *NotificationsStatus) Scan(src interface{}) error {
 	return nil
 }
 
+type AdminUser struct {
+	MailID string `json:"mail_id"`
+	OpenTo string `json:"open_to"`
+}
+
 type ChildComment struct {
 	CommentID       int64     `json:"comment_id"`
 	UserID          int32     `json:"user_id"`
@@ -82,12 +87,12 @@ type ParentComment struct {
 }
 
 type Poll struct {
-	PollID       int32     `json:"poll_id"`
-	PollBy       string    `json:"poll_by"`
-	PollQuestion string    `json:"poll_question"`
-	OptionsCount int32     `json:"options_count"`
-	Options      string    `json:"options"`
-	CreatedAt    time.Time `json:"created_at"`
+	PollID       int32          `json:"poll_id"`
+	PollBy       string         `json:"poll_by"`
+	PollQuestion sql.NullString `json:"poll_question"`
+	OptionsCount int32          `json:"options_count"`
+	Options      string         `json:"options"`
+	CreatedAt    time.Time      `json:"created_at"`
 }
 
 type PollsReaction struct {

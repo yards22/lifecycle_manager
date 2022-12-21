@@ -36,6 +36,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteExpiredTokensStmt, err = db.PrepareContext(ctx, deleteExpiredTokens); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteExpiredTokens: %w", err)
 	}
+	if q.getAdminStmt, err = db.PrepareContext(ctx, getAdmin); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAdmin: %w", err)
+	}
 	if q.getFeedbackStmt, err = db.PrepareContext(ctx, getFeedback); err != nil {
 		return nil, fmt.Errorf("error preparing query GetFeedback: %w", err)
 	}
@@ -119,6 +122,11 @@ func (q *Queries) Close() error {
 	if q.deleteExpiredTokensStmt != nil {
 		if cerr := q.deleteExpiredTokensStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteExpiredTokensStmt: %w", cerr)
+		}
+	}
+	if q.getAdminStmt != nil {
+		if cerr := q.getAdminStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAdminStmt: %w", cerr)
 		}
 	}
 	if q.getFeedbackStmt != nil {
@@ -264,6 +272,7 @@ type Queries struct {
 	commentTrendingUsersStmt      *sql.Stmt
 	createPollsStmt               *sql.Stmt
 	deleteExpiredTokensStmt       *sql.Stmt
+	getAdminStmt                  *sql.Stmt
 	getFeedbackStmt               *sql.Stmt
 	getFollowersCountStmt         *sql.Stmt
 	getFollowingStmt              *sql.Stmt
@@ -294,6 +303,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		commentTrendingUsersStmt:      q.commentTrendingUsersStmt,
 		createPollsStmt:               q.createPollsStmt,
 		deleteExpiredTokensStmt:       q.deleteExpiredTokensStmt,
+		getAdminStmt:                  q.getAdminStmt,
 		getFeedbackStmt:               q.getFeedbackStmt,
 		getFollowersCountStmt:         q.getFollowersCountStmt,
 		getFollowingStmt:              q.getFollowingStmt,

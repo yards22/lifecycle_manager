@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createPolls = `-- name: CreatePolls :exec
@@ -15,9 +16,9 @@ VALUES (?,?,?)
 `
 
 type CreatePollsParams struct {
-	PollQuestion string `json:"poll_question"`
-	OptionsCount int32  `json:"options_count"`
-	Options      string `json:"options"`
+	PollQuestion sql.NullString `json:"poll_question"`
+	OptionsCount int32          `json:"options_count"`
+	Options      string         `json:"options"`
 }
 
 func (q *Queries) CreatePolls(ctx context.Context, arg CreatePollsParams) error {

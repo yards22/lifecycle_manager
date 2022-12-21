@@ -6,18 +6,21 @@ import (
 	"net/http"
 	"os"
 
+	authservice "github.com/yards22/lcmanager/internal/auth_service"
 	"github.com/yards22/lcmanager/internal/feedback_manager"
 	"github.com/yards22/lcmanager/internal/manager"
 	"github.com/yards22/lcmanager/internal/poll_manager"
 )
 
 type App struct {
-	db              *sql.DB
+	db *sql.DB
+	// redis           *redis.Client
 	logger          *log.Logger
 	PollManager     *poll_manager.PollManager
 	FeedbackManager *feedback_manager.FeedbackManager
 	managers        map[string]manager.Manager
 	srv             *http.Server
+	authService     *authservice.AuthService
 }
 
 var (
@@ -31,8 +34,15 @@ func main() {
 		return
 	}
 
+	// redis := initRedis()
+	// if err != nil {
+	// 	l.Fatal("Error: Cannot initialize cache", err)
+	// 	return
+	// }
+
 	app := &App{
-		db:       db,
+		db: db,
+		// redis:    redis,
 		logger:   l,
 		managers: make(map[string]manager.Manager),
 	}
@@ -44,6 +54,7 @@ func main() {
 
 	initManagers(app)
 	initServer(app)
+	initAuthService(app)
 	app.logger.Fatalln(app.srv.ListenAndServe())
 
 }
