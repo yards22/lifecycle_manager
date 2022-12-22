@@ -25,7 +25,15 @@ func (app *App) handleCreatePoll(rw http.ResponseWriter, r *http.Request) {
 
 func (app *App) handleGetPoll(rw http.ResponseWriter, r *http.Request) {
 
-	polls := app.PollManager.Get(r.Context())
+	entry := r.Context().Value(Pools{})
 
-	sendResponse(rw, http.StatusCreated, polls, "These are the polls")
+	if entry == true {
+
+		polls := app.PollManager.Get(r.Context())
+		sendResponse(rw, http.StatusCreated, polls, "These are the polls")
+		return
+	}
+
+	sendErrorResponse(rw, http.StatusUnauthorized, nil, "Unauthorized for this route")
+
 }
