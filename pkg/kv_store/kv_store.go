@@ -35,6 +35,10 @@ func (i *RedisKVStore) Get(key string) string {
 }
 
 func (i *RedisKVStore) Set(key, value string) error {
-	i.client.Set(key, value, 100000000000)
+	i.client.Set(key, value, 0)
 	return nil
+}
+
+func (i *RedisKVStore) Delete(key string) {
+	i.client.Del(key)
 }
