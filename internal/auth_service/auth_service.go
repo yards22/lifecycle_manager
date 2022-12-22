@@ -18,6 +18,12 @@ const SessionAge = 24 * 60 * 60
 var ErrInternalServerError = errors.New("internal server error")
 var ErrUnauthorized = errors.New("unauthorized")
 
+type BlogsCxt struct {
+	Blogs bool
+}
+type PollsCxt struct {
+	Polls bool
+}
 type SendOTPArgs struct {
 	MailId string `json:"mail_id"`
 }
@@ -77,11 +83,16 @@ func (as *AuthService) PerformLogin(ctx context.Context, arg LoginArgs) string {
 	return uuid.Nil.String()
 }
 
+func (as *AuthService) PerformLogout(ctx context.Context, token string) {
+	as.kv.Delete(token)
+}
+
 func (as *AuthService) CheckSession(ctx context.Context, token string) []string {
 	data := as.kv.Get(token)
 	if data != uuid.Nil.String() {
 		open_to := strings.Split(data, " ")[2]
 		categories := strings.Split(open_to, "/")
+		// insert available categories into request context .
 		return categories
 	}
 	return nil

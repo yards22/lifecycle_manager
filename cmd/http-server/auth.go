@@ -1,12 +1,19 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	authservice "github.com/yards22/lcmanager/internal/auth_service"
 )
+
+type Pools struct{}
+
+type Blogs struct{}
+
+type Token struct{}
 
 func (app *App) handleSendOTP(rw http.ResponseWriter, r *http.Request) {
 	var incBody authservice.SendOTPArgs
@@ -27,7 +34,6 @@ func (app *App) handleSendOTP(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sendErrorResponse(rw, http.StatusUnauthorized, nil, "unauthorized")
-	return
 }
 
 func (app *App) handleLogin(rw http.ResponseWriter, r *http.Request) {
@@ -52,19 +58,50 @@ func (app *App) handleLogin(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) handleLogout(rw http.ResponseWriter, r *http.Request) {
-	// pick token from context that is set by middleware
+	token := r.Context().Value(Token{}).(string)
+	app.authService.PerformLogout(r.Context(), token)
 	// delete it from redis
+	sendResponse(rw, http.StatusOK, nil, "Logged out successfully")
 }
 
 func (app *App) checkAllowance(next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		token, err := getCookie(r, "token")
-		if err != nil {
-			//No cookie found
-			sendErrorResponse(rw, http.StatusUnauthorized, nil, "unauthorized")
-			return
+
+		authHeader := r.Header.Get("Authorization")
+		token := BearerAuthHeader(authHeader)
+		if token != "" {
+			categories := app.authService.CheckSession(r.Context(), token)
+			var newCtx context.Context
+			newCtx = context.WithValue(r.Context(), Token{}, token)
+
+			for i := 0; i < len(categories); i++ {
+				if categories[i] == "polls" {
+					newCtx = context.WithValue(r.Context(), Pools{}, true)
+				}
+				if categories[i] == "blogs" {
+					newCtx = context.WithValue(r.Context(), Blogs{}, true)
+				}
+			}
+			next.ServeHTTP(rw, r.WithContext(newCtx))
 		}
-		categories := app.authService.CheckSession(r.Context(), token)
-		fmt.Println(categories)
+		sendErrorResponse(rw, http.StatusUnauthorized, nil, "unauthorized user")
 	})
+}
+
+func BearerAuthHeader(authHeader string) string {
+	if authHeader == "" {
+		return ""
+	}
+
+	parts := strings.Split(authHeader, "Bearer")
+	if len(parts) != 2 {
+		return ""
+	}
+
+	token := strings.TrimSpace(parts[1])
+	if len(token) < 1 {
+		return ""
+	}
+
+	return token
 }
