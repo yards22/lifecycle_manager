@@ -91,9 +91,6 @@ function App() {
               {
                 appStore.currentTab === 1 && <FeedBackScreenIndex/>
               }
-              {
-                appStore.currentTab === 2 && <StoriesScreenIndex/>
-              }
             </AppShell>
           )
         }
