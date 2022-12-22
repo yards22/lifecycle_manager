@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -42,9 +43,28 @@ func (app *App) handleLogin(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	token := app.authService.PerformLogin(r.Context(), incBody)
-
 	if token == uuid.Nil.String() {
-
+		sendErrorResponse(rw, http.StatusBadRequest, nil, "inputs creds are not matching")
+		return
 	}
+	sendResponse(rw, http.StatusOK, token, "Logged in succesfully")
 
+}
+
+func (app *App) handleLogout(rw http.ResponseWriter, r *http.Request) {
+	// pick token from context that is set by middleware
+	// delete it from redis
+}
+
+func (app *App) checkAllowance(next http.Handler) http.HandlerFunc {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		token, err := getCookie(r, "token")
+		if err != nil {
+			//No cookie found
+			sendErrorResponse(rw, http.StatusUnauthorized, nil, "unauthorized")
+			return
+		}
+		categories := app.authService.CheckSession(r.Context(), token)
+		fmt.Println(categories)
+	})
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
@@ -42,14 +43,16 @@ func (as *AuthService) PerformMailIdCheck(ctx context.Context, arg SendOTPArgs) 
 	}
 	if len(admin) != 0 {
 		otp := util.GenerateRandom(6)
-		as.kv.Set("otp_"+otp, arg.MailId)
+		err := as.kv.Set("otp_"+otp, arg.MailId)
+		fmt.Println(err)
 		return otp
 	}
 	return uuid.Nil.String()
 }
 
 func (as *AuthService) PerformLogin(ctx context.Context, arg LoginArgs) string {
-	userDetails := as.kv.Get("otp_" + arg.OTP)
+	userDetails := strings.Split(as.kv.Get("otp_"+arg.OTP), " ")[2]
+	fmt.Println(userDetails)
 	if userDetails == arg.MailId {
 		admin, err := as.querier.GetAdmin(ctx, arg.MailId)
 		if err != nil {
@@ -57,17 +60,29 @@ func (as *AuthService) PerformLogin(ctx context.Context, arg LoginArgs) string {
 		}
 		categories := ""
 		for i := 0; i < len(admin); i++ {
-			categories += *&admin[i].OpenTo
+			categories += admin[i].OpenTo
 			if i+1 != len(admin) {
 				categories += "/"
 			}
 		}
-
 		//    generate a token (n)
+		token := util.GenerateRandom(16)
 		//    set it into redis
-		//    send it back in response object
-
+		for as.kv.Get(token) == "Nil" {
+			token = util.GenerateRandom(16)
+		}
+		as.kv.Set(token, categories)
+		return token
 	}
-
 	return uuid.Nil.String()
+}
+
+func (as *AuthService) CheckSession(ctx context.Context, token string) []string {
+	data := as.kv.Get(token)
+	if data != uuid.Nil.String() {
+		open_to := strings.Split(data, " ")[2]
+		categories := strings.Split(open_to, "/")
+		return categories
+	}
+	return nil
 }

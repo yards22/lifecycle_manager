@@ -186,7 +186,7 @@ CREATE TABLE `admin_users` (
     `mail_id` VARCHAR(191) NOT NULL,
     `open_to` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `admin_users_mail_id_key`(`mail_id`)
+    UNIQUE INDEX `admin_users_mail_id_open_to_key`(`mail_id`, `open_to`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
