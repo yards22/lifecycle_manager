@@ -9,6 +9,13 @@ type Runner struct {
 	quitter  chan struct{}
 }
 
+const TUsersFrequency = 12
+const TPostsFrequency = 6
+const RUsersFrequency = 12
+const RPostsFrequency = 6
+const TCleanerFrequency = 24
+const RatingFrequency = 7 * 24
+
 func New(interval time.Duration) *Runner {
 	return &Runner{
 		interval: interval,

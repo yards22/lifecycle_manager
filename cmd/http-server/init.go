@@ -19,6 +19,7 @@ import (
 	"github.com/yards22/lcmanager/internal/token_manager"
 	"github.com/yards22/lcmanager/pkg/env"
 	kvstore "github.com/yards22/lcmanager/pkg/kv_store"
+	runner "github.com/yards22/lcmanager/pkg/runner"
 )
 
 type Author struct {
@@ -34,38 +35,20 @@ func initDB() (*sql.DB, error) {
 	return db, nil
 }
 
-// func initRedis() *redis.Client {
-// 	client := redis.NewClient(&redis.Options{
-// 		Addr:     "localhost:6379",
-// 		Password: "",
-// 		DB:       0,
-// 	})
-// 	// json, err := json.Marshal(Author{Name: "Elliot", Age: 25})
-// 	// if err != nil {
-// 	// 	fmt.Println(err)
-// 	// }
-
-// 	// err = client.Set("id1234", json, 0).Err()
-// 	// if err != nil {
-// 	// 	fmt.Println(err)
-// 	// }
-// 	return client
-// }
-
 func initRunnerManagers(app *App) {
 	// Initialize managers and add to app
-	tokenManager := token_manager.New(sqlc.New(app.db), time.Hour)
+	tokenManager := token_manager.New(sqlc.New(app.db), (runner.TCleanerFrequency)*(time.Hour))
 	app.managers["tokenManager"] = tokenManager
-	trendingPostsManager := t_posts_manager.New(sqlc.New(app.db), 24*(time.Hour))
+	trendingPostsManager := t_posts_manager.New(sqlc.New(app.db), (runner.TPostsFrequency)*(time.Hour))
 	app.managers["trendingPostsManager"] = trendingPostsManager
-	trendingUserManager := t_users_manager.New(sqlc.New(app.db), 24*(time.Hour))
+	trendingUserManager := t_users_manager.New(sqlc.New(app.db), (runner.TUsersFrequency)*(time.Hour))
 	app.managers["trendingUserManager"] = trendingUserManager
-	recommendedUsersManager := r_users_manager.New(sqlc.New(app.db), 12*(time.Hour))
+	recommendedUsersManager := r_users_manager.New(sqlc.New(app.db), (runner.RUsersFrequency)*(time.Hour))
 	app.managers["recommendedUsersManager"] = recommendedUsersManager
-	recommendedPostsManager := r_posts_manager.New(sqlc.New(app.db), 6*(time.Hour))
-	app.managers["recommendedUsersManager"] = recommendedPostsManager
-	ratingManager := r_manager.New(sqlc.New(app.db), 12*(time.Hour))
-	app.managers["recommendedUsersManager"] = ratingManager
+	recommendedPostsManager := r_posts_manager.New(sqlc.New(app.db), (runner.RPostsFrequency)*(time.Hour))
+	app.managers["recommendedPostsManager"] = recommendedPostsManager
+	ratingManager := r_manager.New(sqlc.New(app.db), (runner.RatingFrequency)*(time.Hour))
+	app.managers["ratingManager"] = ratingManager
 }
 
 func initManagers(app *App) {

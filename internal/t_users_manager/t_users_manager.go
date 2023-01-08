@@ -24,20 +24,19 @@ func New(querier sqlc.Querier, interval time.Duration) *TUManager {
 	return &TUManager{querier, runner.New(interval)}
 }
 
-// Function to clean expired tokens from DB
+// Function to generate trending users .
 func (tpm *TUManager) GenerateTrendingUsers(ctx context.Context) {
 
 	// Get Likes-Posts array.
-	// These are all the likes that got generated during last week.
+	// These are all the likes that got generated during last day.
 
 	likes, err := tpm.querier.LikeTrendingUsers(ctx)
 	if err != nil {
 		fmt.Println(err.Error())
-
 	}
 
 	// Get Comment-Posts array.
-	// These are all the likes that got generated during last week.
+	// These are all the likes that got generated during last day.
 
 	comments, err := tpm.querier.CommentTrendingUsers(ctx)
 	if err != nil {
@@ -45,6 +44,7 @@ func (tpm *TUManager) GenerateTrendingUsers(ctx context.Context) {
 	}
 
 	// Get Share-Posts array.
+	// Will be implemented after the share functionality is added.
 
 	// Combine all the above and form CAI and post array.
 
