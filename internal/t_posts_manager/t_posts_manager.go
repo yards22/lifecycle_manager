@@ -16,8 +16,9 @@ type TPManager struct {
 }
 
 type Tentries struct {
-	id    int64
-	count int
+	id     int64
+	count  int
+	status bool
 }
 
 func New(querier sqlc.Querier, interval time.Duration) *TPManager {
@@ -31,6 +32,7 @@ func (tpm *TPManager) GenerateTrendingPosts(ctx context.Context) {
 	// These are all the likes that got generated during last week.
 
 	likes, err := tpm.querier.LikeTrending(ctx)
+
 	if err != nil {
 		fmt.Println(err.Error())
 
@@ -69,14 +71,11 @@ func (tpm *TPManager) GenerateTrendingPosts(ctx context.Context) {
 	})
 
 	// pick top 10 of the above array.
-
 	topPicks := make([]Tentries, 0, 10)
 
 	for _, k := range keys {
-		topPicks = append(topPicks, Tentries{k, CAI[k]})
+		topPicks = append(topPicks, Tentries{k, CAI[k], true})
 	}
-
-	fmt.Println(topPicks)
 
 	// Insert these posts into Trending Table.
 	for _, j := range topPicks {

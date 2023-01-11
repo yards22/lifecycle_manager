@@ -36,19 +36,38 @@ func (rum *RUManager) GenerateRecommendedUsers(ctx context.Context) {
 	for user := 1; user <= int(usersCount); user++ {
 
 		mutuals_id, err := rum.querier.GetMutual(ctx, int32(user))
-
+		if err != nil {
+			fmt.Println(err)
+		}
+		following_ids, err := rum.querier.GetFollowingIds(ctx, int32(user))
 		if err != nil {
 			fmt.Println(err)
 		}
 
+		var uniqueIds []int32
+		for i := 0; i < len(mutuals_id); i++ {
+			is_present := true
+			for j := 0; j < len(following_ids); j++ {
+				if following_ids[j] == mutuals_id[i] {
+					is_present = false
+					break
+				}
+			}
+			if is_present {
+				uniqueIds = append(uniqueIds, mutuals_id[i])
+			}
+		}
+
 		var stringified_mutual_id []string
 
-		for mutual := 0; mutual < len(mutuals_id); mutual++ {
-			m_id := strconv.Itoa(int(mutuals_id[mutual]))
+		for mutual := 0; mutual < len(uniqueIds); mutual++ {
+			m_id := strconv.Itoa(int(uniqueIds[mutual]))
 			stringified_mutual_id = append(stringified_mutual_id, m_id)
 		}
 
 		res := strings.Join(stringified_mutual_id, "-")
+
+		fmt.Println(res)
 
 		if res != "" {
 			rum.querier.UpsertUserRecommendations(ctx, sqlc.UpsertUserRecommendationsParams{
@@ -57,9 +76,7 @@ func (rum *RUManager) GenerateRecommendedUsers(ctx context.Context) {
 				Recommend_2: res,
 			})
 		}
-
 	}
-
 }
 
 func (rum *RUManager) Run() {

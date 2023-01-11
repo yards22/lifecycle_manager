@@ -11,7 +11,7 @@ type Runner struct {
 
 const TUsersFrequency = 12
 const TPostsFrequency = 6
-const RUsersFrequency = 12
+const RUsersFrequency = 3
 const RPostsFrequency = 6
 const TCleanerFrequency = 24
 const RatingFrequency = 7 * 24
