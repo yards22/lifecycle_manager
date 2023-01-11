@@ -87,12 +87,12 @@ type ParentComment struct {
 }
 
 type Poll struct {
-	PollID       int32          `json:"poll_id"`
-	PollBy       string         `json:"poll_by"`
-	PollQuestion sql.NullString `json:"poll_question"`
-	OptionsCount int32          `json:"options_count"`
-	Options      string         `json:"options"`
-	CreatedAt    time.Time      `json:"created_at"`
+	PollID       int32     `json:"poll_id"`
+	PollBy       string    `json:"poll_by"`
+	PollQuestion string    `json:"poll_question"`
+	OptionsCount int32     `json:"options_count"`
+	Options      string    `json:"options"`
+	CreatedAt    time.Time `json:"created_at"`
 }
 
 type PollsReaction struct {
@@ -129,6 +129,15 @@ type Profile struct {
 	Following       int32          `json:"following"`
 	Followers       int32          `json:"followers"`
 	Interests       sql.NullString `json:"interests"`
+}
+
+type Story struct {
+	StoryID   int32     `json:"story_id"`
+	UserID    int32     `json:"user_id"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	Media     string    `json:"media"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Token struct {
