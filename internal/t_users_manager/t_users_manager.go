@@ -52,7 +52,6 @@ func (tpm *TUManager) GenerateTrendingUsers(ctx context.Context) {
 
 	for _, j := range likes {
 		CAI[(*j).UserID] += int((*j).LikeCount)
-
 	}
 
 	for _, j := range comments {
