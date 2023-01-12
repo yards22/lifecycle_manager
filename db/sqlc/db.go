@@ -30,8 +30,17 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.commentTrendingUsersStmt, err = db.PrepareContext(ctx, commentTrendingUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query CommentTrendingUsers: %w", err)
 	}
+	if q.createPollsStmt, err = db.PrepareContext(ctx, createPolls); err != nil {
+		return nil, fmt.Errorf("error preparing query CreatePolls: %w", err)
+	}
 	if q.deleteExpiredTokensStmt, err = db.PrepareContext(ctx, deleteExpiredTokens); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteExpiredTokens: %w", err)
+	}
+	if q.getAdminStmt, err = db.PrepareContext(ctx, getAdmin); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAdmin: %w", err)
+	}
+	if q.getFeedbackStmt, err = db.PrepareContext(ctx, getFeedback); err != nil {
+		return nil, fmt.Errorf("error preparing query GetFeedback: %w", err)
 	}
 	if q.getFollowersCountStmt, err = db.PrepareContext(ctx, getFollowersCount); err != nil {
 		return nil, fmt.Errorf("error preparing query GetFollowersCount: %w", err)
@@ -51,6 +60,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getMutualStmt, err = db.PrepareContext(ctx, getMutual); err != nil {
 		return nil, fmt.Errorf("error preparing query GetMutual: %w", err)
 	}
+	if q.getPollsStmt, err = db.PrepareContext(ctx, getPolls); err != nil {
+		return nil, fmt.Errorf("error preparing query GetPolls: %w", err)
+	}
 	if q.getPostsStmt, err = db.PrepareContext(ctx, getPosts); err != nil {
 		return nil, fmt.Errorf("error preparing query GetPosts: %w", err)
 	}
@@ -65,6 +77,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.getUsersStmt, err = db.PrepareContext(ctx, getUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUsers: %w", err)
+	}
+	if q.insertAdminStmt, err = db.PrepareContext(ctx, insertAdmin); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertAdmin: %w", err)
 	}
 	if q.insertTrendingStmt, err = db.PrepareContext(ctx, insertTrending); err != nil {
 		return nil, fmt.Errorf("error preparing query InsertTrending: %w", err)
@@ -102,9 +117,24 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing commentTrendingUsersStmt: %w", cerr)
 		}
 	}
+	if q.createPollsStmt != nil {
+		if cerr := q.createPollsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createPollsStmt: %w", cerr)
+		}
+	}
 	if q.deleteExpiredTokensStmt != nil {
 		if cerr := q.deleteExpiredTokensStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteExpiredTokensStmt: %w", cerr)
+		}
+	}
+	if q.getAdminStmt != nil {
+		if cerr := q.getAdminStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAdminStmt: %w", cerr)
+		}
+	}
+	if q.getFeedbackStmt != nil {
+		if cerr := q.getFeedbackStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getFeedbackStmt: %w", cerr)
 		}
 	}
 	if q.getFollowersCountStmt != nil {
@@ -137,6 +167,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getMutualStmt: %w", cerr)
 		}
 	}
+	if q.getPollsStmt != nil {
+		if cerr := q.getPollsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getPollsStmt: %w", cerr)
+		}
+	}
 	if q.getPostsStmt != nil {
 		if cerr := q.getPostsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getPostsStmt: %w", cerr)
@@ -160,6 +195,11 @@ func (q *Queries) Close() error {
 	if q.getUsersStmt != nil {
 		if cerr := q.getUsersStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUsersStmt: %w", cerr)
+		}
+	}
+	if q.insertAdminStmt != nil {
+		if cerr := q.insertAdminStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertAdminStmt: %w", cerr)
 		}
 	}
 	if q.insertTrendingStmt != nil {
@@ -238,18 +278,23 @@ type Queries struct {
 	tx                            *sql.Tx
 	commentTrendingStmt           *sql.Stmt
 	commentTrendingUsersStmt      *sql.Stmt
+	createPollsStmt               *sql.Stmt
 	deleteExpiredTokensStmt       *sql.Stmt
+	getAdminStmt                  *sql.Stmt
+	getFeedbackStmt               *sql.Stmt
 	getFollowersCountStmt         *sql.Stmt
 	getFollowingStmt              *sql.Stmt
 	getFollowingIdsStmt           *sql.Stmt
 	getFollowingReactionStmt      *sql.Stmt
 	getFollwersStmt               *sql.Stmt
 	getMutualStmt                 *sql.Stmt
+	getPollsStmt                  *sql.Stmt
 	getPostsStmt                  *sql.Stmt
 	getRatingStmt                 *sql.Stmt
 	getUserCommentsStmt           *sql.Stmt
 	getUserLikesStmt              *sql.Stmt
 	getUsersStmt                  *sql.Stmt
+	insertAdminStmt               *sql.Stmt
 	insertTrendingStmt            *sql.Stmt
 	insertTrendingUsersStmt       *sql.Stmt
 	likeTrendingStmt              *sql.Stmt
@@ -265,18 +310,23 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		tx:                            tx,
 		commentTrendingStmt:           q.commentTrendingStmt,
 		commentTrendingUsersStmt:      q.commentTrendingUsersStmt,
+		createPollsStmt:               q.createPollsStmt,
 		deleteExpiredTokensStmt:       q.deleteExpiredTokensStmt,
+		getAdminStmt:                  q.getAdminStmt,
+		getFeedbackStmt:               q.getFeedbackStmt,
 		getFollowersCountStmt:         q.getFollowersCountStmt,
 		getFollowingStmt:              q.getFollowingStmt,
 		getFollowingIdsStmt:           q.getFollowingIdsStmt,
 		getFollowingReactionStmt:      q.getFollowingReactionStmt,
 		getFollwersStmt:               q.getFollwersStmt,
 		getMutualStmt:                 q.getMutualStmt,
+		getPollsStmt:                  q.getPollsStmt,
 		getPostsStmt:                  q.getPostsStmt,
 		getRatingStmt:                 q.getRatingStmt,
 		getUserCommentsStmt:           q.getUserCommentsStmt,
 		getUserLikesStmt:              q.getUserLikesStmt,
 		getUsersStmt:                  q.getUsersStmt,
+		insertAdminStmt:               q.insertAdminStmt,
 		insertTrendingStmt:            q.insertTrendingStmt,
 		insertTrendingUsersStmt:       q.insertTrendingUsersStmt,
 		likeTrendingStmt:              q.likeTrendingStmt,

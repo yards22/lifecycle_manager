@@ -10,26 +10,31 @@ import (
 )
 
 const getFollowingReaction = `-- name: GetFollowingReaction :many
-SELECT count(user_id) as like_count from likes
+SELECT count(user_id) as like_count,post_id from likes
 where user_id in (
 SELECT following_id from networks WHERE
 follower_id =(?))
 GROUP BY post_id
 `
 
-func (q *Queries) GetFollowingReaction(ctx context.Context, followerID int32) ([]int64, error) {
+type GetFollowingReactionRow struct {
+	LikeCount int64 `json:"like_count"`
+	PostID    int64 `json:"post_id"`
+}
+
+func (q *Queries) GetFollowingReaction(ctx context.Context, followerID int32) ([]*GetFollowingReactionRow, error) {
 	rows, err := q.query(ctx, q.getFollowingReactionStmt, getFollowingReaction, followerID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []int64{}
+	items := []*GetFollowingReactionRow{}
 	for rows.Next() {
-		var like_count int64
-		if err := rows.Scan(&like_count); err != nil {
+		var i GetFollowingReactionRow
+		if err := rows.Scan(&i.LikeCount, &i.PostID); err != nil {
 			return nil, err
 		}
-		items = append(items, like_count)
+		items = append(items, &i)
 	}
 	if err := rows.Close(); err != nil {
 		return nil, err

@@ -10,7 +10,7 @@ SELECT following_id from networks
 where follower_id =(?);
 
 -- name: GetMutual :many
-SELECT DISTINCT(n1.following_id) from networks as n1  
+SELECT DISTINCT (n1.following_id) from networks as n1  
 WHERE n1.follower_id  IN (
  SELECT n2.following_id from networks as n2
  WHERE n2.follower_id  = (?)

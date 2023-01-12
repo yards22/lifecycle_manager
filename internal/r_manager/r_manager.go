@@ -26,7 +26,6 @@ func New(querier sqlc.Querier, interval time.Duration) *RatingManager {
 	return &RatingManager{querier, runner.New(interval)}
 }
 
-// Function to clean expired tokens from DB
 func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 	// create a map for storing this week credits of each user.
 	score := make(map[int]float64)

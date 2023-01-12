@@ -31,6 +31,11 @@ func (e *NotificationsStatus) Scan(src interface{}) error {
 	return nil
 }
 
+type AdminUser struct {
+	MailID string `json:"mail_id"`
+	OpenTo string `json:"open_to"`
+}
+
 type ChildComment struct {
 	CommentID       int64     `json:"comment_id"`
 	UserID          int32     `json:"user_id"`
@@ -42,6 +47,13 @@ type ChildComment struct {
 type Favourite struct {
 	UserID int32 `json:"user_id"`
 	PostID int64 `json:"post_id"`
+}
+
+type Feedback struct {
+	FeedbackID int64          `json:"feedback_id"`
+	UserID     int32          `json:"user_id"`
+	ImageUri   sql.NullString `json:"image_uri"`
+	Content    sql.NullString `json:"content"`
 }
 
 type Like struct {
@@ -74,6 +86,21 @@ type ParentComment struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type Poll struct {
+	PollID       int32     `json:"poll_id"`
+	PollBy       string    `json:"poll_by"`
+	PollQuestion string    `json:"poll_question"`
+	OptionsCount int32     `json:"options_count"`
+	Options      string    `json:"options"`
+	CreatedAt    time.Time `json:"created_at"`
+}
+
+type PollsReaction struct {
+	PollID int32 `json:"poll_id"`
+	UserID int32 `json:"user_id"`
+	Type   int32 `json:"type"`
+}
+
 type Post struct {
 	UserID     int32          `json:"user_id"`
 	PostID     int64          `json:"post_id"`
@@ -102,6 +129,15 @@ type Profile struct {
 	Following       int32          `json:"following"`
 	Followers       int32          `json:"followers"`
 	Interests       sql.NullString `json:"interests"`
+}
+
+type Story struct {
+	StoryID   int32     `json:"story_id"`
+	UserID    int32     `json:"user_id"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	Media     string    `json:"media"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Token struct {

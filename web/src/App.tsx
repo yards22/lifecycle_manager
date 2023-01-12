@@ -60,62 +60,6 @@ function App() {
         ()=>{
           const {appStore} = store;
           return(
-            // <AppShell
-            //     ref={divRef}
-            //     navbarOffsetBreakpoint="sm"
-            //     asideOffsetBreakpoint="sm"
-            //     navbar={
-            //       <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }}>
-            //         <STabs 
-            //            onClick={()=> appStore.SetCurrentTab(0)}
-            //            style = {{
-            //               color : appStore.currentTab === 0 ? "white" : "black",
-            //               backgroundColor : appStore.currentTab === 0 ? theme.colors.blue[6] : "white"
-            //            }}
-            //          >Polls Section</STabs>
-            //         <STabs 
-            //           onClick={()=> appStore.SetCurrentTab(1)}
-            //           style = {{
-            //             color : appStore.currentTab === 1 ? "white" : "black",
-            //             backgroundColor : appStore.currentTab === 1 ? theme.colors.blue[6] : "white"
-            //          }}
-            //         >Feedbacks Section</STabs>
-            //         <STabs 
-            //           onClick={()=> appStore.SetCurrentTab(2)}
-            //           style = {{
-            //             color : appStore.currentTab === 2 ? "white" : "black",
-            //             backgroundColor : appStore.currentTab === 2 ? theme.colors.blue[6] : "white"
-            //          }}
-            //           >Stories Section</STabs>
-            //       </Navbar>
-            //     }
-            //     header={
-            //       <Header height={60} p="md">
-            //         <div style={{ display: 'flex', alignItems: 'center', height: '100%',  }}>
-            //           <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
-            //             <Burger
-            //               opened={opened}
-            //               onClick={() => setOpened((o) => !o)}
-            //               size="sm"
-            //               color={theme.colors.gray[6]}
-            //               mr="xl"
-            //             />
-            //           </MediaQuery>
-            //           <Text>ADMIN 22 Yards</Text>
-            //         </div>
-            //       </Header>
-            //     }
-            // > 
-            //   {
-            //     appStore.currentTab === 0 &&  <PollsScreenIndex/>
-            //   }
-            //   {
-            //     appStore.currentTab === 1 && <FeedBackScreenIndex/>
-            //   }
-            //   {
-            //     appStore.currentTab === 2 && <StoriesScreenIndex/>
-            //   }
-            // </AppShell>
             <Router>
               {appStore.isPhone && <BottomBar/>}
               <TopBar/>
