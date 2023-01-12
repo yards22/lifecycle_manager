@@ -58,11 +58,11 @@ function App() {
     <Observer>
       {
         ()=>{
-          const {appStore} = store;
+          const {appStore,authStore} = store;
           return(
             <Router>
-              {appStore.isPhone && <BottomBar/>}
-              <TopBar/>
+              { authStore.isUserLoggedIn && appStore.isPhone && <BottomBar/>}
+              { authStore.isUserLoggedIn && <TopBar/>}
               <SApp>
                  <Routes>
                    <Route path="/" element={<LoginScreenIndex/>} />
