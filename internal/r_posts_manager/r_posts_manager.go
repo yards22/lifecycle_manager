@@ -36,7 +36,7 @@ func (rpm *RPManager) GenerateRecommendedPosts(ctx context.Context) {
 		var stringified_post_id []string
 
 		for post := 0; post < len(post_id); post++ {
-			p_id := strconv.Itoa(int(post_id[post]))
+			p_id := strconv.Itoa(int(post_id[post].PostID))
 			stringified_post_id = append(stringified_post_id, p_id)
 		}
 
@@ -46,7 +46,8 @@ func (rpm *RPManager) GenerateRecommendedPosts(ctx context.Context) {
 
 		// stringify the list of post_id's
 
-		res := strings.Join(stringified_post_id, "-")
+		res := strings.Join(stringified_post_id, ",")
+		fmt.Println(res)
 		if res != "" {
 			rpm.querier.UpsertPostRecommendations(ctx, sqlc.UpsertPostRecommendationsParams{
 				UserID:                int32(user),

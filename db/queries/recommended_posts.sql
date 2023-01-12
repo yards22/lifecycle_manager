@@ -1,5 +1,5 @@
 -- name: GetFollowingReaction :many
-SELECT count(user_id) as like_count from likes
+SELECT count(user_id) as like_count,post_id from likes
 where user_id in (
 SELECT following_id from networks WHERE
 follower_id =(?))

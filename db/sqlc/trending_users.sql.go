@@ -53,9 +53,10 @@ func (q *Queries) InsertTrendingUsers(ctx context.Context, userID int32) error {
 }
 
 const likeTrendingUsers = `-- name: LikeTrendingUsers :many
-SELECT user_id,COUNT(post_id) as like_count from likes
-WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 DAY) 
-GROUP BY user_id
+SELECT posts.user_id,COUNT(likes.post_id) as like_count from likes
+INNER JOIN posts ON posts.post_id = likes.post_id
+WHERE likes.created_at >= DATE_SUB(NOW(),INTERVAL 1 DAY) 
+GROUP BY posts.user_id
 `
 
 type LikeTrendingUsersRow struct {
