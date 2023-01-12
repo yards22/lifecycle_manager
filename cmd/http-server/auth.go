@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -15,9 +16,12 @@ type Blogs struct{}
 
 type Token struct{}
 
+type Feedback struct{}
+
 func (app *App) handleSendOTP(rw http.ResponseWriter, r *http.Request) {
 	var incBody authservice.SendOTPArgs
 	err := getBody(r, &incBody)
+	fmt.Println(incBody)
 	if err != nil {
 		sendErrorResponse(rw, http.StatusBadRequest, nil, err.Error())
 		return
@@ -59,6 +63,7 @@ func (app *App) handleLogin(rw http.ResponseWriter, r *http.Request) {
 
 func (app *App) handleLogout(rw http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value(Token{}).(string)
+	fmt.Println(token)
 	app.authService.PerformLogout(r.Context(), token)
 	// delete it from redis
 	sendResponse(rw, http.StatusOK, nil, "Logged out successfully")
@@ -81,10 +86,14 @@ func (app *App) checkAllowance(next http.Handler) http.HandlerFunc {
 				if categories[i] == "blogs" {
 					newCtx = context.WithValue(r.Context(), Blogs{}, true)
 				}
+				if categories[i] == "feedback" {
+					newCtx = context.WithValue(r.Context(), Feedback{}, true)
+				}
 			}
 			next.ServeHTTP(rw, r.WithContext(newCtx))
+			return
 		}
-		sendErrorResponse(rw, http.StatusUnauthorized, nil, "unauthorized user")
+		sendErrorResponse(rw, http.StatusUnauthorized, nil, "unauthorized_user")
 	})
 }
 
