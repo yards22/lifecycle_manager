@@ -40,6 +40,35 @@ func (app *App) handleSendOTP(rw http.ResponseWriter, r *http.Request) {
 	sendErrorResponse(rw, http.StatusUnauthorized, nil, "unauthorized")
 }
 
+func (app *App) handleAddRole(rw http.ResponseWriter, r *http.Request) {
+	var incBody authservice.RegisterRoleArgs
+	err := getBody(r, &incBody)
+	if err != nil {
+		sendErrorResponse(rw, http.StatusBadRequest, nil, err.Error())
+		return
+	}
+	if incBody.MailId == "" {
+		sendErrorResponse(rw, http.StatusBadRequest, nil, "mailid_missing")
+		return
+	}
+	if incBody.SecretKey == "" {
+		sendErrorResponse(rw, http.StatusBadRequest, nil, "secret_missing")
+		return
+	}
+	if incBody.Role == "" {
+		sendErrorResponse(rw, http.StatusBadRequest, nil, "role_missing")
+		return
+	}
+
+	response := app.authService.PerformRoleSignup(r.Context(), incBody)
+
+	if response != uuid.Nil.String() {
+		sendResponse(rw, http.StatusOK, response, response)
+		return
+	}
+	sendErrorResponse(rw, http.StatusUnauthorized, nil, "secret_invalid")
+}
+
 func (app *App) handleLogin(rw http.ResponseWriter, r *http.Request) {
 	var incBody authservice.LoginArgs
 	err := getBody(r, &incBody)

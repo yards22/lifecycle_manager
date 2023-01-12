@@ -78,6 +78,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getUsersStmt, err = db.PrepareContext(ctx, getUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUsers: %w", err)
 	}
+	if q.insertAdminStmt, err = db.PrepareContext(ctx, insertAdmin); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertAdmin: %w", err)
+	}
 	if q.insertTrendingStmt, err = db.PrepareContext(ctx, insertTrending); err != nil {
 		return nil, fmt.Errorf("error preparing query InsertTrending: %w", err)
 	}
@@ -194,6 +197,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getUsersStmt: %w", cerr)
 		}
 	}
+	if q.insertAdminStmt != nil {
+		if cerr := q.insertAdminStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertAdminStmt: %w", cerr)
+		}
+	}
 	if q.insertTrendingStmt != nil {
 		if cerr := q.insertTrendingStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing insertTrendingStmt: %w", cerr)
@@ -286,6 +294,7 @@ type Queries struct {
 	getUserCommentsStmt           *sql.Stmt
 	getUserLikesStmt              *sql.Stmt
 	getUsersStmt                  *sql.Stmt
+	insertAdminStmt               *sql.Stmt
 	insertTrendingStmt            *sql.Stmt
 	insertTrendingUsersStmt       *sql.Stmt
 	likeTrendingStmt              *sql.Stmt
@@ -317,6 +326,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getUserCommentsStmt:           q.getUserCommentsStmt,
 		getUserLikesStmt:              q.getUserLikesStmt,
 		getUsersStmt:                  q.getUsersStmt,
+		insertAdminStmt:               q.insertAdminStmt,
 		insertTrendingStmt:            q.insertTrendingStmt,
 		insertTrendingUsersStmt:       q.insertTrendingUsersStmt,
 		likeTrendingStmt:              q.likeTrendingStmt,

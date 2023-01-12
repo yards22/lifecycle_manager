@@ -27,6 +27,7 @@ type Querier interface {
 	GetUserComments(ctx context.Context) ([]*GetUserCommentsRow, error)
 	GetUserLikes(ctx context.Context) ([]*GetUserLikesRow, error)
 	GetUsers(ctx context.Context) (int64, error)
+	InsertAdmin(ctx context.Context, arg InsertAdminParams) error
 	InsertTrending(ctx context.Context, postID int64) error
 	InsertTrendingUsers(ctx context.Context, userID int32) error
 	LikeTrending(ctx context.Context) ([]*LikeTrendingRow, error)

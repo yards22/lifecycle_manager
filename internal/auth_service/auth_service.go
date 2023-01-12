@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
+	"github.com/yards22/lcmanager/pkg/env"
 	kvstore "github.com/yards22/lcmanager/pkg/kv_store"
 	util "github.com/yards22/lcmanager/util"
 )
@@ -31,6 +32,16 @@ type SendOTPArgs struct {
 type LoginArgs struct {
 	MailId string `json:"mail_id"`
 	OTP    string `json:"otp"`
+}
+type InsertAdminParams struct {
+	MailID string `json:"mail_id"`
+	OpenTo string `json:"open_to"`
+}
+
+type RegisterRoleArgs struct {
+	MailId    string `json:"mail_id"`
+	Role      string `json:"role"`
+	SecretKey string `json:"secret_key"`
 }
 
 type AuthService struct {
@@ -77,6 +88,21 @@ func (as *AuthService) PerformLogin(ctx context.Context, arg LoginArgs) string {
 		}
 		as.kv.Set("admin_"+token, categories)
 		return token
+	}
+	return uuid.Nil.String()
+}
+
+func (as *AuthService) PerformRoleSignup(ctx context.Context, arg RegisterRoleArgs) string {
+	secret_key := env.ViperGetEnvVar("SECRET")
+	if arg.SecretKey == secret_key {
+		err := as.querier.InsertAdmin(ctx, sqlc.InsertAdminParams{
+			MailID: arg.MailId,
+			OpenTo: arg.Role,
+		})
+		if err != nil {
+			fmt.Println(err)
+		}
+		return "successful_signup"
 	}
 	return uuid.Nil.String()
 }
