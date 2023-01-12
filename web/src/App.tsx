@@ -24,6 +24,9 @@ const STabs = styled.div`
 const SApp = styled.section`
   max-width: 100%;
   overflow: auto;
+  ::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 
