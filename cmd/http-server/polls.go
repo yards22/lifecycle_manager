@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
@@ -27,13 +28,15 @@ func (app *App) handleGetPoll(rw http.ResponseWriter, r *http.Request) {
 
 	entry := r.Context().Value(Pools{})
 
+	fmt.Println("entry_bool", entry)
+
 	if entry == true {
 
 		polls := app.PollManager.Get(r.Context())
-		sendResponse(rw, http.StatusCreated, polls, "These are the polls")
+		sendResponse(rw, http.StatusCreated, polls, "polls_section")
 		return
 	}
 
-	sendErrorResponse(rw, http.StatusUnauthorized, nil, "Unauthorized for this route")
+	sendErrorResponse(rw, http.StatusUnauthorized, nil, "unauthorized_user")
 
 }

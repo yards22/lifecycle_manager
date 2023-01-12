@@ -49,7 +49,7 @@ func (as *AuthService) PerformMailIdCheck(ctx context.Context, arg SendOTPArgs) 
 	}
 	if len(admin) != 0 {
 		otp := util.GenerateRandom(6)
-		err := as.kv.Set("otp_"+otp, arg.MailId)
+		err := as.kv.Set("admin_otp_"+otp, arg.MailId)
 		fmt.Println(err)
 		return otp
 	}
@@ -57,7 +57,7 @@ func (as *AuthService) PerformMailIdCheck(ctx context.Context, arg SendOTPArgs) 
 }
 
 func (as *AuthService) PerformLogin(ctx context.Context, arg LoginArgs) string {
-	userDetails := strings.Split(as.kv.Get("otp_"+arg.OTP), " ")[2]
+	userDetails := strings.Split(as.kv.Get("admin_otp_"+arg.OTP), " ")[2]
 	fmt.Println(userDetails)
 	if userDetails == arg.MailId {
 		admin, err := as.querier.GetAdmin(ctx, arg.MailId)
@@ -71,28 +71,25 @@ func (as *AuthService) PerformLogin(ctx context.Context, arg LoginArgs) string {
 				categories += "/"
 			}
 		}
-		//    generate a token (n)
-		token := util.GenerateRandom(16)
-		//    set it into redis
+		token := util.GenerateRandomToken(64)
 		for as.kv.Get(token) == "Nil" {
-			token = util.GenerateRandom(16)
+			token = util.GenerateRandomToken(64)
 		}
-		as.kv.Set(token, categories)
+		as.kv.Set("admin_"+token, categories)
 		return token
 	}
 	return uuid.Nil.String()
 }
 
 func (as *AuthService) PerformLogout(ctx context.Context, token string) {
-	as.kv.Delete(token)
+	as.kv.Delete("admin_" + token)
 }
 
 func (as *AuthService) CheckSession(ctx context.Context, token string) []string {
-	data := as.kv.Get(token)
+	data := as.kv.Get("admin_" + token)
 	if data != uuid.Nil.String() {
 		open_to := strings.Split(data, " ")[2]
 		categories := strings.Split(open_to, "/")
-		// insert available categories into request context .
 		return categories
 	}
 	return nil
