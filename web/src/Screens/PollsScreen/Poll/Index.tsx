@@ -28,7 +28,7 @@ const Flag = styled.div`
   transform: rotate(-45deg);
 `;
 
-function PollIndex() {
+function PollCardIndex() {
   const { colors } = useMantineTheme();
   const stores = useStores();
 
@@ -44,17 +44,17 @@ function PollIndex() {
       {
         ()=>{
           return(
-            <Indicator 
-              style={{
-                 width : stores.appStore.currentWindowSize > 1050 ? "45%": "95%",
-              }}
-              color = "red"
-              label = {<X size={20} onClick={handleDeleteAPoll} style={{cursor:"pointer"}}/>}
-              size = {29}
-            >
+            // <Indicator 
+            //   style={{
+            //      width : stores.appStore.deviceWidth > 1050 ? "45%": "95%",
+            //   }}
+            //   color = "red"
+            //   label = {<X size={20} onClick={handleDeleteAPoll} style={{cursor:"pointer"}}/>}
+            //   size = {29}
+            // >
                <SEventsIndex 
                   theme={{
-                    widthOfContainer : stores.appStore.currentWindowSize
+                    widthOfContainer : stores.appStore.deviceWidth
                   }}
                 >
                   <Card shadow="lg" p="lg" withBorder style={{ padding: "0" }}>
@@ -83,7 +83,7 @@ function PollIndex() {
                     </div>
                   </Card>
               </SEventsIndex>
-            </Indicator>
+            // </Indicator>
           )
         }
       }
@@ -91,4 +91,4 @@ function PollIndex() {
   );
 }
 
-export default PollIndex;
+export default PollCardIndex;

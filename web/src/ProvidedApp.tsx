@@ -3,9 +3,11 @@ import { Observer } from 'mobx-react-lite';
 import React from 'react'
 import styled from 'styled-components';
 import { StoresContext } from './Logic/Providers/StateProvider';
+import { AuthRepo } from './Logic/Repository/AuthRepo';
 import { FeedBackRepo } from './Logic/Repository/FeedBackRepo';
 import AppStore from './Logic/State/AppStore'
-import { FeedBackStore } from './Logic/State/FeedBack';
+import { AuthStore } from './Logic/State/AuthStore';
+import { FeedBackStore } from './Logic/State/FeedBackStore';
 import { Request } from './Logic/Utils/Fetch';
 
 const SProvidedApp = styled.div`
@@ -16,19 +18,21 @@ interface ProvidedAppProps {
     children?: React.ReactNode;
   }
 
-const BASE_URL = "localhost:4000"
+const BASE_URL = "http://localhost:3001"
 
 function ProvidedApp(props:ProvidedAppProps) {
   const rq = new Request({});
   const appStore = new AppStore();
-  const feedBackStore = new FeedBackStore(new FeedBackRepo(BASE_URL,rq))
+  const authStore = new AuthStore(new AuthRepo(BASE_URL,rq))
+  const feedBackStore = new FeedBackStore(new FeedBackRepo(BASE_URL+"/feedback",rq))
 
   return (
     <SProvidedApp>
       <StoresContext.Provider
         value={{
           appStore,
-          feedBackStore
+          feedBackStore,
+          authStore
         }}
       >
         { 
