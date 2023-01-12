@@ -2,6 +2,7 @@ package kvstore
 
 import (
 	"errors"
+	"time"
 
 	"github.com/go-redis/redis"
 )
@@ -35,7 +36,7 @@ func (i *RedisKVStore) Get(key string) string {
 }
 
 func (i *RedisKVStore) Set(key, value string) error {
-	i.client.Set(key, value, 0)
+	i.client.Set(key, value, 24*time.Hour)
 	return nil
 }
 
