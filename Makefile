@@ -7,6 +7,14 @@ dev:
 dev_windows:
 	cd cmd\http-server\ && go run .
 
-feb:
-	cd web && yarn build && cp -r build ../build/
+lcm:
+	rm -rf app
+	mkdir app
+	make feb
+	make beb
 
+feb:
+	cd web && yarn && yarn build && cp -r build ../app/
+
+beb:
+	go build -o app/api cmd/http-server/*.go

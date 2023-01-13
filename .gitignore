@@ -1,3 +1,4 @@
 .env
 internal/manager/*.json
 build/
+api
