@@ -18,7 +18,7 @@ interface ProvidedAppProps {
     children?: React.ReactNode;
   }
 
-const BASE_URL = "http://localhost:5000"
+const BASE_URL = "http://localhost:3001"
 
 function ProvidedApp(props:ProvidedAppProps) {
   const rq = new Request({});
