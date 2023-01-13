@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -18,6 +19,7 @@ func getBody(r *http.Request, v interface{}) error {
 	if err != nil {
 		return ErrCouldNotReadBody
 	}
+	fmt.Println(body)
 	err = json.Unmarshal(body, v)
 	if err != nil {
 		return ErrCouldNotParseBody

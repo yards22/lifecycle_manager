@@ -29,7 +29,6 @@ type Feedback struct{}
 func (app *App) handleSendOTP(rw http.ResponseWriter, r *http.Request) {
 	var incBody authservice.SendOTPArgs
 	err := getBody(r, &incBody)
-	fmt.Println(incBody)
 	if err != nil {
 		sendErrorResponse(rw, http.StatusBadRequest, nil, err.Error())
 		return
