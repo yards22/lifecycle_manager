@@ -15,13 +15,30 @@ const SLoginScreenIndex = styled.div`
 function LoginScreenIndex() {
   const stores = useStores();
   const [mailId,setMailId] = useState("")
+  const [otp,setOTP] = useState("")
+  const [currentState , setCurrentState] = useState(1)
 
   function handleMailIdChange(e:any){
     setMailId(e.target.value)
   }
 
-  function handleSendAuthOTP(){
-    stores.authStore.SendAuthOTP(mailId)
+  function handleOTPChange(e:any){
+    setOTP(e.target.value)
+  }
+
+  async function handleSendAuthOTP(){
+    const res = await stores.authStore.SendAuthOTP(mailId)
+    if(res === 200){
+      setCurrentState(2)
+    }
+  }
+
+  async function handleVerifyOTP() {
+    const res = await stores.authStore.VerifyAuthOTP(mailId,otp)
+    console.log("mail_ID",res)
+    if(res===200){
+      stores.authStore.SetIsUserLoggedIn(true)
+    }
   }
 
   return (
@@ -32,14 +49,28 @@ function LoginScreenIndex() {
          radius="md" 
          withBorder
          style={{ display:"flex",justifyContent:"center",alignItems:"center",flexDirection:"column" }}
-       >
-          <Input 
-              placeholder="email" 
-              onChange={handleMailIdChange} 
-              style={{minWidth : "250px", marginBottom:"15px"}} 
-              type={"email"}
-           />
-           <Button onClick={handleSendAuthOTP}>Send OTP</Button>
+       >  
+         { currentState === 1 &&
+          <>         
+             <Input 
+                placeholder="email" 
+                onChange={handleMailIdChange} 
+                style={{minWidth : "250px", marginBottom:"15px"}} 
+              />
+              <Button onClick={handleSendAuthOTP}>Send OTP</Button>
+           </>
+          }
+          {
+            currentState === 2 &&
+            <>
+              <Input 
+                placeholder="OTP" 
+                onChange={handleOTPChange} 
+                style={{minWidth : "250px", marginBottom:"15px"}} 
+              />
+              <Button onClick={handleVerifyOTP}>Verify OTP</Button>
+            </>
+          }
        </Card>
     </SLoginScreenIndex>
   )
