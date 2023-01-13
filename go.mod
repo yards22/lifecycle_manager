@@ -7,6 +7,8 @@ require (
 	github.com/orted-org/vyoza v0.0.0-20220328092619-55055f7dd46a
 )
 
+require github.com/rs/cors v1.8.3 // indirect
+
 require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/go-chi/chi/v5 v5.0.7 // indirect

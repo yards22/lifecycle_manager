@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
+	cors "github.com/rs/cors"
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
 	authservice "github.com/yards22/lcmanager/internal/auth_service"
 	"github.com/yards22/lcmanager/internal/feedback_manager"
@@ -61,6 +62,14 @@ func initManagers(app *App) {
 
 func initServer(app *App) {
 	r := chi.NewRouter()
+
+	reactUri := env.ViperGetEnvVar("REACT_URI")
+	r.Use(cors.New(cors.Options{
+		AllowedOrigins:   []string{reactUri},
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+	}).Handler)
+
 	initHandler(app, r)
 	srv := http.Server{
 		Addr:    env.ViperGetEnvVar("SERVER_ADDR"),

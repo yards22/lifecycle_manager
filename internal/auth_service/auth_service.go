@@ -86,7 +86,8 @@ func (as *AuthService) PerformLogin(ctx context.Context, arg LoginArgs) string {
 		for as.kv.Get(token) == "Nil" {
 			token = util.GenerateRandomToken(64)
 		}
-		as.kv.Set("admin_"+token, categories)
+		x := arg.MailId + "/" + categories
+		as.kv.Set("admin_"+token, x)
 		return token
 	}
 	return uuid.Nil.String()

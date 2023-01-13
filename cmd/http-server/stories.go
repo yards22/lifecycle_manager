@@ -1,15 +1,11 @@
 package main
 
-import (
-	"net/http"
-)
+import "net/http"
 
-func (app *App) handleGetFeedback(rw http.ResponseWriter, r *http.Request) {
-
+func (app *App) handleCreateStories(rw http.ResponseWriter, r *http.Request) {
 	x := (r.Context().Value("user")).(UserDetails)
 
-	if x.Feedback {
-
+	if x.Stories {
 		feedback := app.FeedbackManager.GetFeedback(r.Context())
 		sendResponse(rw, http.StatusCreated, feedback, "feedback_section")
 		return

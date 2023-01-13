@@ -12,6 +12,7 @@ type Querier interface {
 	CommentTrending(ctx context.Context) ([]*CommentTrendingRow, error)
 	CommentTrendingUsers(ctx context.Context) ([]*CommentTrendingUsersRow, error)
 	CreatePolls(ctx context.Context, arg CreatePollsParams) error
+	CreateStories(ctx context.Context, arg CreateStoriesParams) error
 	DeleteExpiredTokens(ctx context.Context) error
 	GetAdmin(ctx context.Context, mailID string) ([]*AdminUser, error)
 	GetFeedback(ctx context.Context) ([]*Feedback, error)
@@ -24,6 +25,7 @@ type Querier interface {
 	GetPolls(ctx context.Context) ([]*Poll, error)
 	GetPosts(ctx context.Context) ([]*GetPostsRow, error)
 	GetRating(ctx context.Context, userID int32) (int32, error)
+	GetStories(ctx context.Context) ([]*Story, error)
 	GetUserComments(ctx context.Context) ([]*GetUserCommentsRow, error)
 	GetUserLikes(ctx context.Context) ([]*GetUserLikesRow, error)
 	GetUsers(ctx context.Context) (int64, error)
