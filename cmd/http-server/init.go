@@ -19,6 +19,7 @@ import (
 	"github.com/yards22/lcmanager/internal/token_manager"
 	"github.com/yards22/lcmanager/pkg/env"
 	kvstore "github.com/yards22/lcmanager/pkg/kv_store"
+	objectstore "github.com/yards22/lcmanager/pkg/object_store"
 	runner "github.com/yards22/lcmanager/pkg/runner"
 )
 
@@ -71,4 +72,16 @@ func initServer(app *App) {
 
 func initAuthService(app *App) {
 	app.authService = authservice.New(kvstore.New(), sqlc.New(app.db))
+}
+
+func initObjectStore(app *App) {
+	accessId := env.ViperGetEnvVar("S3_ACCESS_ID")
+	region := env.ViperGetEnvVar("S3_REGION")
+	secret := env.ViperGetEnvVar("S3_SECRET")
+	bucket := env.ViperGetEnvVar("S3_BUCKET")
+	objectStore, err := objectstore.New(accessId, secret, region, bucket)
+	if err != nil {
+		panic(err)
+	}
+	app.objectStore = objectStore
 }

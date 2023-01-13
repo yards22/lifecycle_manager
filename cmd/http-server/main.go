@@ -10,6 +10,7 @@ import (
 	"github.com/yards22/lcmanager/internal/feedback_manager"
 	"github.com/yards22/lcmanager/internal/manager"
 	"github.com/yards22/lcmanager/internal/poll_manager"
+	objectstore "github.com/yards22/lcmanager/pkg/object_store"
 )
 
 type App struct {
@@ -21,6 +22,7 @@ type App struct {
 	managers        map[string]manager.Manager
 	srv             *http.Server
 	authService     *authservice.AuthService
+	objectStore     objectstore.ObjectStore
 }
 
 var (
@@ -55,6 +57,7 @@ func main() {
 	initManagers(app)
 	initServer(app)
 	initAuthService(app)
+	initObjectStore(app)
 	app.logger.Fatalln(app.srv.ListenAndServe())
 
 }
