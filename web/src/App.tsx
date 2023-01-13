@@ -9,6 +9,7 @@ import styled from "styled-components"
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import TopBar from "./Organs/Navbar/TopBar/TopBar";
 import BottomBar from "./Organs/Navbar/BottomBar";
+import LoginScreenIndex from "./Screens/LoginScreen/Index";
 
 const STabs = styled.div`
   height: 50px;
@@ -23,6 +24,9 @@ const STabs = styled.div`
 const SApp = styled.section`
   max-width: 100%;
   overflow: auto;
+  ::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 
@@ -54,13 +58,14 @@ function App() {
     <Observer>
       {
         ()=>{
-          const {appStore} = store;
+          const {appStore,authStore} = store;
           return(
             <Router>
-              {appStore.isPhone && <BottomBar/>}
-              <TopBar/>
+              { authStore.isUserLoggedIn && appStore.isPhone && <BottomBar/>}
+              { authStore.isUserLoggedIn && <TopBar/>}
               <SApp>
                  <Routes>
+                   <Route path="/" element={<LoginScreenIndex/>} />
                    <Route path="/feedback" element={<FeedBackScreenIndex/>}/>
                    <Route path="/polls" element={<PollsScreenIndex/>}/>
                    <Route path="/stories" element={<StoriesScreenIndex/>}/>
