@@ -61,11 +61,13 @@ func (app *App) handleUploadImage(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	// putting image in image store
-	fileName := id + ".png"
+	//TODO: change the filename
+	fileName := "temp_" + ".png"
 	s3ImageUrl, err := app.objectStore.Put(file, fileName)
 	if err != nil {
 		sendErrorResponse(rw, http.StatusInternalServerError, nil, err.Error())
 		return
 	}
+	sendResponse(rw, 200, s3ImageUrl, "ok")
 
 }

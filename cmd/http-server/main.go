@@ -30,11 +30,6 @@ var (
 )
 
 func main() {
-	db, err := initDB()
-	if err != nil {
-		l.Fatal("Error: Cannot initialize database", err)
-		return
-	}
 
 	// redis := initRedis()
 	// if err != nil {
@@ -43,21 +38,20 @@ func main() {
 	// }
 
 	app := &App{
-		db: db,
-		// redis:    redis,
 		logger:   l,
 		managers: make(map[string]manager.Manager),
 	}
 
+	initDB(app)
 	initRunnerManagers(app)
 	for _, v := range app.managers {
 		go v.Run()
 	}
-
 	initManagers(app)
 	initServer(app)
 	initAuthService(app)
 	initObjectStore(app)
+	app.logger.Println("app running on", app.srv.Addr)
 	app.logger.Fatalln(app.srv.ListenAndServe())
 
 }
