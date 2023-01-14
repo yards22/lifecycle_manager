@@ -21,7 +21,7 @@ func init() {
 	var basePath string
 	switch {
 	case re.MatchString(os):
-		basePath = filepath.Join("../../", ".env")
+		basePath = filepath.Join("../../", "")
 	default:
 		basePath = filepath.Join("")
 	}

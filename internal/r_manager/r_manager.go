@@ -125,8 +125,6 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 		reactions[int(comments[comment_].UserID)] += float64(comments[comment_].CommentCount)
 	}
 
-	fmt.Println("reaction", reactions[1])
-
 	// get followers count
 
 	follower_count, err := rm.querier.GetFollowersCount(ctx)
@@ -156,7 +154,7 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 			println(err)
 		}
 
-		updated_index := get_rating + int32(rm.RatingFunction(score[user], (get_rating/200)*5))
+		updated_index := get_rating + int32(rm.RatingFunction(score[user], (get_rating/200)))
 
 		rm.querier.UpdateRating(ctx, sqlc.UpdateRatingParams{
 			CricIndex: updated_index,
@@ -168,12 +166,12 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 
 func (rm *RatingManager) RatingFunction(score float64, present_slab int32) float64 {
 
-	threshold := [9]float64{0, 5, 10, 15, 20, 25, 30, 35, 40}
+	threshold := [9]float64{0, 5, 10, 15, 20, 25, 30, 35}
 
-	denom := math.Log2(float64(present_slab + 1))
+	denom := math.Log2(float64(present_slab + 2))
 	num := score - threshold[present_slab]
-
 	return num / denom
+
 }
 
 func (rm *RatingManager) Run() {
