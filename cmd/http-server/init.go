@@ -17,10 +17,9 @@ import (
 	"github.com/yards22/lcmanager/internal/t_posts_manager"
 	"github.com/yards22/lcmanager/internal/t_users_manager"
 	"github.com/yards22/lcmanager/internal/token_manager"
-	"github.com/yards22/lcmanager/pkg/env"
+	"github.com/yards22/lcmanager/pkg/app_config"
 	kvstore "github.com/yards22/lcmanager/pkg/kv_store"
 	objectstore "github.com/yards22/lcmanager/pkg/object_store"
-	runner "github.com/yards22/lcmanager/pkg/runner"
 )
 
 type Author struct {
@@ -28,27 +27,46 @@ type Author struct {
 	Age  int    `json:"age"`
 }
 
-func initDB() (*sql.DB, error) {
-	db, err := sql.Open(env.ViperGetEnvVar("DB_DRIVER_NAME"), env.ViperGetEnvVar("DB_DATA_SOURCE_NAME"))
+func initDB(app *App) {
+	db, err := sql.Open(app_config.Data.MustString("DB_DRIVER_NAME"), app_config.Data.MustString("DB_DATA_SOURCE_NAME"))
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	return db, nil
+	app.db = db
+	app.logger.Println("connected to db")
 }
 
 func initRunnerManagers(app *App) {
 	// Initialize managers and add to app
-	tokenManager := token_manager.New(sqlc.New(app.db), (runner.TCleanerFrequency)*(time.Hour))
+
+	// token manager runner
+	d := time.Duration(app_config.Data.MustInt("duration_token") * int(time.Minute))
+	tokenManager := token_manager.New(sqlc.New(app.db), d)
 	app.managers["tokenManager"] = tokenManager
-	trendingPostsManager := t_posts_manager.New(sqlc.New(app.db), (runner.TPostsFrequency)*(time.Hour))
+
+	// trending post runner
+	d = time.Duration(app_config.Data.MustInt("duration_trending_post") * int(time.Minute))
+	trendingPostsManager := t_posts_manager.New(sqlc.New(app.db), d)
 	app.managers["trendingPostsManager"] = trendingPostsManager
-	trendingUserManager := t_users_manager.New(sqlc.New(app.db), (runner.TUsersFrequency)*(time.Hour))
+
+	// trending user runner
+	d = time.Duration(app_config.Data.MustInt("duration_trending_user") * int(time.Minute))
+	trendingUserManager := t_users_manager.New(sqlc.New(app.db), d)
 	app.managers["trendingUserManager"] = trendingUserManager
-	recommendedUsersManager := r_users_manager.New(sqlc.New(app.db), (runner.RUsersFrequency)*(time.Hour))
+
+	// recommended user runner
+	d = time.Duration(app_config.Data.MustInt("duration_recommended_user") * int(time.Minute))
+	recommendedUsersManager := r_users_manager.New(sqlc.New(app.db), d)
 	app.managers["recommendedUsersManager"] = recommendedUsersManager
-	recommendedPostsManager := r_posts_manager.New(sqlc.New(app.db), (runner.RPostsFrequency)*(time.Hour))
+
+	// recommended post runner
+	d = time.Duration(app_config.Data.MustInt("duration_recommended_post") * int(time.Minute))
+	recommendedPostsManager := r_posts_manager.New(sqlc.New(app.db), d)
 	app.managers["recommendedPostsManager"] = recommendedPostsManager
-	ratingManager := r_manager.New(sqlc.New(app.db), (runner.RatingFrequency)*(time.Hour))
+
+	// rating runner
+	d = time.Duration(app_config.Data.MustInt("duration_rating") * int(time.Minute))
+	ratingManager := r_manager.New(sqlc.New(app.db), d)
 	app.managers["ratingManager"] = ratingManager
 }
 
@@ -64,7 +82,7 @@ func initServer(app *App) {
 	r := chi.NewRouter()
 	initHandler(app, r)
 	srv := http.Server{
-		Addr:    env.ViperGetEnvVar("SERVER_ADDR"),
+		Addr:    app_config.Data.MustString("SERVER_ADDR"),
 		Handler: r,
 	}
 	app.srv = &srv
@@ -75,10 +93,10 @@ func initAuthService(app *App) {
 }
 
 func initObjectStore(app *App) {
-	accessId := env.ViperGetEnvVar("S3_ACCESS_ID")
-	region := env.ViperGetEnvVar("S3_REGION")
-	secret := env.ViperGetEnvVar("S3_SECRET")
-	bucket := env.ViperGetEnvVar("S3_BUCKET")
+	accessId := app_config.Data.MustString("S3_ACCESS_ID")
+	region := app_config.Data.MustString("S3_REGION")
+	secret := app_config.Data.MustString("S3_SECRET")
+	bucket := app_config.Data.MustString("S3_BUCKET")
 	objectStore, err := objectstore.New(accessId, secret, region, bucket)
 	if err != nil {
 		panic(err)

@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
-	"github.com/yards22/lcmanager/pkg/env"
+	"github.com/yards22/lcmanager/pkg/app_config"
 	kvstore "github.com/yards22/lcmanager/pkg/kv_store"
 	util "github.com/yards22/lcmanager/util"
 )
@@ -93,7 +93,7 @@ func (as *AuthService) PerformLogin(ctx context.Context, arg LoginArgs) string {
 }
 
 func (as *AuthService) PerformRoleSignup(ctx context.Context, arg RegisterRoleArgs) string {
-	secret_key := env.ViperGetEnvVar("SECRET")
+	secret_key := app_config.Data.MustString("SECRET")
 	if arg.SecretKey == secret_key {
 		err := as.querier.InsertAdmin(ctx, sqlc.InsertAdminParams{
 			MailID: arg.MailId,
