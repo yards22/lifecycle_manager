@@ -19,21 +19,8 @@ jobs:
         with:
           go-version: 1.18
       - run: npm install -g typescript
+      - run: cp runner_duration.json ./app
       - run: make lcm
-      - name: SSH and resolve
-        env:
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY  }}
-          HOSTNAME: ${{ secrets.HOSTNAME  }}
-          USER_NAME: ${{ secrets.USER_NAME  }}
-        run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
-            
-            #Now we have got the access of EC2 and we will start the deploy .
-            export NVM_DIR="/home/ubuntu/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            pm2 delete lcm
-          '
       - name: SCP and Copy code
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY  }}
@@ -52,7 +39,5 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
             
             #Now we have got the access of EC2 and we will start the deploy .
-            export NVM_DIR="/home/ubuntu/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            make deploy_lcm
+            make lcm
           '
