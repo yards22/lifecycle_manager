@@ -13,6 +13,7 @@ func initHandler(app *App, r *chi.Mux) {
 	r.Post("/addRole", app.handleAddRole)
 	r.Post("/poll", app.checkAllowance(http.HandlerFunc(app.handleCreatePoll)))
 	r.Get("/poll", app.checkAllowance(http.HandlerFunc(app.handleGetPoll)))
+	r.Post("/stories/uploadImg",app.checkAllowance(http.HandlerFunc(app.handleUploadImage)))
 	r.Get("/feedback", app.checkAllowance(http.HandlerFunc(app.handleGetFeedback)))
 
 	// WebUI
