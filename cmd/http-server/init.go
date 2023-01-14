@@ -32,41 +32,48 @@ func initDB(app *App) {
 	if err != nil {
 		panic(err)
 	}
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
 	app.db = db
 	app.logger.Println("connected to db")
+
 }
 
 func initRunnerManagers(app *App) {
 	// Initialize managers and add to app
 
+	querier := sqlc.New(app.db)
+
 	// token manager runner
 	d := time.Duration(app_config.Data.MustInt("duration_token") * int(time.Minute))
-	tokenManager := token_manager.New(sqlc.New(app.db), d)
+	tokenManager := token_manager.New(querier, d)
 	app.managers["tokenManager"] = tokenManager
 
 	// trending post runner
 	d = time.Duration(app_config.Data.MustInt("duration_trending_post") * int(time.Minute))
-	trendingPostsManager := t_posts_manager.New(sqlc.New(app.db), d)
+	trendingPostsManager := t_posts_manager.New(querier, d)
 	app.managers["trendingPostsManager"] = trendingPostsManager
 
 	// trending user runner
 	d = time.Duration(app_config.Data.MustInt("duration_trending_user") * int(time.Minute))
-	trendingUserManager := t_users_manager.New(sqlc.New(app.db), d)
+	trendingUserManager := t_users_manager.New(querier, d)
 	app.managers["trendingUserManager"] = trendingUserManager
 
 	// recommended user runner
 	d = time.Duration(app_config.Data.MustInt("duration_recommended_user") * int(time.Minute))
-	recommendedUsersManager := r_users_manager.New(sqlc.New(app.db), d)
+	recommendedUsersManager := r_users_manager.New(querier, d)
 	app.managers["recommendedUsersManager"] = recommendedUsersManager
 
 	// recommended post runner
 	d = time.Duration(app_config.Data.MustInt("duration_recommended_post") * int(time.Minute))
-	recommendedPostsManager := r_posts_manager.New(sqlc.New(app.db), d)
+	recommendedPostsManager := r_posts_manager.New(querier, d)
 	app.managers["recommendedPostsManager"] = recommendedPostsManager
 
 	// rating runner
 	d = time.Duration(app_config.Data.MustInt("duration_rating") * int(time.Minute))
-	ratingManager := r_manager.New(sqlc.New(app.db), d)
+	ratingManager := r_manager.New(querier, d)
 	app.managers["ratingManager"] = ratingManager
 }
 
