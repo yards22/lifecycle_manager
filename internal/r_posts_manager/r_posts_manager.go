@@ -3,6 +3,7 @@ package r_posts_manager
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -17,6 +18,7 @@ type RPManager struct {
 }
 
 func New(querier sqlc.Querier, interval time.Duration) *RPManager {
+	log.Println("setup recommended post runner at interval", interval.Minutes())
 	return &RPManager{querier, runner.New(interval)}
 }
 
@@ -62,6 +64,7 @@ func (rpm *RPManager) GenerateRecommendedPosts(ctx context.Context) {
 
 func (rm *RPManager) Run() {
 	rm.runner.Run(func() {
+		log.Println("invoking recommended post runner fn")
 		rm.GenerateRecommendedPosts(context.Background())
 	})
 

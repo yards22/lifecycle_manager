@@ -3,6 +3,7 @@ package t_posts_manager
 import (
 	"context"
 	"fmt"
+	"log"
 	"sort"
 	"time"
 
@@ -22,6 +23,7 @@ type Tentries struct {
 }
 
 func New(querier sqlc.Querier, interval time.Duration) *TPManager {
+	log.Println("setup trending post runner at interval", interval.Minutes())
 	return &TPManager{querier, runner.New(interval)}
 }
 
@@ -86,6 +88,7 @@ func (tpm *TPManager) GenerateTrendingPosts(ctx context.Context) {
 
 func (tm *TPManager) Run() {
 	tm.runner.Run(func() {
+		log.Println("invoking trending post fn")
 		tm.GenerateTrendingPosts(context.Background())
 	})
 
