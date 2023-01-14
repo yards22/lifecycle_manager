@@ -3,6 +3,7 @@ package t_users_manager
 import (
 	"context"
 	"fmt"
+	"log"
 	"sort"
 	"time"
 
@@ -21,6 +22,7 @@ type Tentries struct {
 }
 
 func New(querier sqlc.Querier, interval time.Duration) *TUManager {
+	log.Println("setup trending user runner at interval", interval.Minutes())
 	return &TUManager{querier, runner.New(interval)}
 }
 
@@ -86,6 +88,7 @@ func (tpm *TUManager) GenerateTrendingUsers(ctx context.Context) {
 
 func (tm *TUManager) Run() {
 	tm.runner.Run(func() {
+		log.Println("invoking trending user runner fn")
 		tm.GenerateTrendingUsers(context.Background())
 	})
 

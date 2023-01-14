@@ -3,6 +3,7 @@ package r_manager
 import (
 	"context"
 	"fmt"
+	"log"
 	"math"
 	"time"
 
@@ -23,6 +24,7 @@ type RatingManager struct {
 }
 
 func New(querier sqlc.Querier, interval time.Duration) *RatingManager {
+	log.Println("setup rating runner at interval", interval.Minutes())
 	return &RatingManager{querier, runner.New(interval)}
 }
 
@@ -176,6 +178,7 @@ func (rm *RatingManager) RatingFunction(score float64, present_slab int32) float
 
 func (rm *RatingManager) Run() {
 	rm.runner.Run(func() {
+		log.Println("invoking rating runner fn")
 		rm.UpdateRatings(context.Background())
 	})
 }
