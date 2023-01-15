@@ -8,6 +8,7 @@ import (
 	"time"
 
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
+	"github.com/yards22/lcmanager/pkg/app_config"
 	"github.com/yards22/lcmanager/pkg/runner"
 )
 
@@ -78,6 +79,10 @@ func (tpm *TPManager) GenerateTrendingPosts(ctx context.Context) {
 	for _, k := range keys {
 		topPicks = append(topPicks, Tentries{k, CAI[k], true})
 	}
+
+	// delete the trending posts except last few weeks
+
+	tpm.querier.DeleteTrendingPosts(ctx, app_config.Data.MustInt("trending_posts_lifetime"))
 
 	// Insert these posts into Trending Table.
 	for _, j := range topPicks {
