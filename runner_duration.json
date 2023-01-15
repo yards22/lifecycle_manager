@@ -4,5 +4,8 @@
     "duration_trending_post": 2,
     "duration_recommended_user": 2,
     "duration_recommended_post": 2,
-    "duration_rating": 1
+    "duration_rating": 7,
+    "trending_posts_lifetime":3,
+    "trending_users_lifetime":3
+
 }

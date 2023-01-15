@@ -36,6 +36,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteExpiredTokensStmt, err = db.PrepareContext(ctx, deleteExpiredTokens); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteExpiredTokens: %w", err)
 	}
+	if q.deleteTrendingPostsStmt, err = db.PrepareContext(ctx, deleteTrendingPosts); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteTrendingPosts: %w", err)
+	}
+	if q.deleteTrendingUsersStmt, err = db.PrepareContext(ctx, deleteTrendingUsers); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteTrendingUsers: %w", err)
+	}
 	if q.getAdminStmt, err = db.PrepareContext(ctx, getAdmin); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAdmin: %w", err)
 	}
@@ -125,6 +131,16 @@ func (q *Queries) Close() error {
 	if q.deleteExpiredTokensStmt != nil {
 		if cerr := q.deleteExpiredTokensStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteExpiredTokensStmt: %w", cerr)
+		}
+	}
+	if q.deleteTrendingPostsStmt != nil {
+		if cerr := q.deleteTrendingPostsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteTrendingPostsStmt: %w", cerr)
+		}
+	}
+	if q.deleteTrendingUsersStmt != nil {
+		if cerr := q.deleteTrendingUsersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteTrendingUsersStmt: %w", cerr)
 		}
 	}
 	if q.getAdminStmt != nil {
@@ -280,6 +296,8 @@ type Queries struct {
 	commentTrendingUsersStmt      *sql.Stmt
 	createPollsStmt               *sql.Stmt
 	deleteExpiredTokensStmt       *sql.Stmt
+	deleteTrendingPostsStmt       *sql.Stmt
+	deleteTrendingUsersStmt       *sql.Stmt
 	getAdminStmt                  *sql.Stmt
 	getFeedbackStmt               *sql.Stmt
 	getFollowersCountStmt         *sql.Stmt
@@ -312,6 +330,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		commentTrendingUsersStmt:      q.commentTrendingUsersStmt,
 		createPollsStmt:               q.createPollsStmt,
 		deleteExpiredTokensStmt:       q.deleteExpiredTokensStmt,
+		deleteTrendingPostsStmt:       q.deleteTrendingPostsStmt,
+		deleteTrendingUsersStmt:       q.deleteTrendingUsersStmt,
 		getAdminStmt:                  q.getAdminStmt,
 		getFeedbackStmt:               q.getFeedbackStmt,
 		getFollowersCountStmt:         q.getFollowersCountStmt,

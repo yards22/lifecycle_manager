@@ -130,6 +130,7 @@ CREATE TABLE `postRecommendations` (
 CREATE TABLE `trending_users` (
     `tu_id` BIGINT NOT NULL AUTO_INCREMENT,
     `user_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`tu_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -138,6 +139,7 @@ CREATE TABLE `trending_users` (
 CREATE TABLE `trending_posts` (
     `tp_id` BIGINT NOT NULL AUTO_INCREMENT,
     `post_id` BIGINT NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`tp_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -184,13 +186,23 @@ CREATE TABLE `polls_reaction` (
 -- CreateTable
 CREATE TABLE `stories` (
     `story_id` INTEGER NOT NULL AUTO_INCREMENT,
-    `user_id` INTEGER NOT NULL,
-    `title` VARCHAR(191) NOT NULL,
+    `mail_id` VARCHAR(191) NOT NULL,
     `content` VARCHAR(191) NOT NULL,
     `media` VARCHAR(191) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`story_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `draft_stories` (
+    `draft_id` INTEGER NOT NULL AUTO_INCREMENT,
+    `mail_id` VARCHAR(191) NOT NULL,
+    `content` VARCHAR(191) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    UNIQUE INDEX `draft_stories_mail_id_key`(`mail_id`),
+    PRIMARY KEY (`draft_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -266,6 +278,3 @@ ALTER TABLE `polls_reaction` ADD CONSTRAINT `polls_reaction_poll_id_fkey` FOREIG
 
 -- AddForeignKey
 ALTER TABLE `polls_reaction` ADD CONSTRAINT `polls_reaction_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `stories` ADD CONSTRAINT `stories_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;

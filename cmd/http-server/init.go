@@ -72,7 +72,7 @@ func initRunnerManagers(app *App) {
 	app.managers["recommendedPostsManager"] = recommendedPostsManager
 
 	// rating runner
-	d = time.Duration(app_config.Data.MustInt("duration_rating") * int(time.Minute))
+	d = time.Duration(app_config.Data.MustInt("duration_rating") * int(time.Hour))
 	ratingManager := r_manager.New(querier, d)
 	app.managers["ratingManager"] = ratingManager
 }
