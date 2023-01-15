@@ -17,6 +17,7 @@ func New(querier sqlc.Querier) *PollManager {
 
 func (pm *PollManager) Create(ctx context.Context, arg sqlc.CreatePollsParams) {
 	err := pm.querier.CreatePolls(ctx, sqlc.CreatePollsParams{
+		PollBy:       arg.PollBy,
 		PollQuestion: arg.PollQuestion,
 		OptionsCount: arg.OptionsCount,
 		Options:      arg.Options,

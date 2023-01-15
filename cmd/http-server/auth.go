@@ -10,18 +10,25 @@ import (
 	authservice "github.com/yards22/lcmanager/internal/auth_service"
 )
 
-type Pools struct{}
+type UserDetails struct {
+	Token    string `json:"token"`
+	Polls    bool
+	Feedback bool
+	Stories  bool
+	MailId   string
+}
 
-type Blogs struct{}
+type Stories struct{}
 
 type Token struct{}
+
+type MailId struct{}
 
 type Feedback struct{}
 
 func (app *App) handleSendOTP(rw http.ResponseWriter, r *http.Request) {
 	var incBody authservice.SendOTPArgs
 	err := getBody(r, &incBody)
-	fmt.Println(incBody)
 	if err != nil {
 		sendErrorResponse(rw, http.StatusBadRequest, nil, err.Error())
 		return
@@ -94,7 +101,6 @@ func (app *App) handleLogout(rw http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value(Token{}).(string)
 	fmt.Println(token)
 	app.authService.PerformLogout(r.Context(), token)
-	// delete it from redis
 	sendResponse(rw, http.StatusOK, nil, "Logged out successfully")
 }
 
@@ -105,22 +111,28 @@ func (app *App) checkAllowance(next http.Handler) http.HandlerFunc {
 		token := BearerAuthHeader(authHeader)
 		if token != "" {
 			categories := app.authService.CheckSession(r.Context(), token)
-			var newCtx context.Context
-			newCtx = context.WithValue(r.Context(), Token{}, token)
+			if categories != nil {
+				var newCtx context.Context
+				var x UserDetails
+				x.MailId = categories[0]
+				x.Token = token
+				for i := 1; i < len(categories); i++ {
 
-			for i := 0; i < len(categories); i++ {
-				if categories[i] == "polls" {
-					newCtx = context.WithValue(r.Context(), Pools{}, true)
+					if categories[i] == "polls" {
+						x.Polls = true
+					}
+					if categories[i] == "stories" {
+						x.Stories = true
+					}
+					if categories[i] == "feedback" {
+						x.Feedback = true
+					}
 				}
-				if categories[i] == "blogs" {
-					newCtx = context.WithValue(r.Context(), Blogs{}, true)
-				}
-				if categories[i] == "feedback" {
-					newCtx = context.WithValue(r.Context(), Feedback{}, true)
-				}
+				newCtx = context.WithValue(r.Context(), "user", x)
+				fmt.Println(newCtx.Value("user"))
+				next.ServeHTTP(rw, r.WithContext(newCtx))
+				return
 			}
-			next.ServeHTTP(rw, r.WithContext(newCtx))
-			return
 		}
 		sendErrorResponse(rw, http.StatusUnauthorized, nil, "unauthorized_user")
 	})

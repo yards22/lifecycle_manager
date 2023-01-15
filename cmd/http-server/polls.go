@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -9,29 +8,34 @@ import (
 )
 
 func (app *App) handleCreatePoll(rw http.ResponseWriter, r *http.Request) {
-	var arg sqlc.CreatePollsParams
-	err := getBody(r, &arg)
-	if err != nil {
-		sendErrorResponse(rw, http.StatusBadRequest, nil, err.Error())
+	x := (r.Context().Value("user")).(UserDetails)
+	if x.Polls {
+		var arg sqlc.CreatePollsParams
+		arg.PollBy = x.MailId
+		err := getBody(r, &arg)
+		if err != nil {
+			sendErrorResponse(rw, http.StatusBadRequest, nil, err.Error())
+			return
+		}
+
+		app.PollManager.Create(r.Context(), arg)
+
+		if err != nil {
+			sendErrorResponse(rw, http.StatusInternalServerError, err, "")
+			return
+		}
+		sendResponse(rw, http.StatusCreated, arg, "poll created")
 		return
 	}
 
-	app.PollManager.Create(r.Context(), arg)
-
-	if err != nil {
-		sendErrorResponse(rw, http.StatusInternalServerError, err, "")
-		return
-	}
-	sendResponse(rw, http.StatusCreated, arg, "poll created")
+	sendErrorResponse(rw, http.StatusUnauthorized, nil, "unauthorized_user")
 }
 
 func (app *App) handleGetPoll(rw http.ResponseWriter, r *http.Request) {
 
-	entry := r.Context().Value(Pools{})
+	x := (r.Context().Value("user")).(UserDetails)
 
-	fmt.Println("entry_bool", entry)
-
-	if entry == true {
+	if x.Polls {
 
 		polls := app.PollManager.Get(r.Context())
 		sendResponse(rw, http.StatusCreated, polls, "polls_section")

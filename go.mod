@@ -15,6 +15,8 @@ require (
 	github.com/onsi/gomega v1.24.2 // indirect
 )
 
+require github.com/rs/cors v1.8.3 // indirect
+
 require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-redis/redis v6.15.9+incompatible

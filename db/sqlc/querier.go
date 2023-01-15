@@ -12,6 +12,7 @@ type Querier interface {
 	CommentTrending(ctx context.Context) ([]*CommentTrendingRow, error)
 	CommentTrendingUsers(ctx context.Context) ([]*CommentTrendingUsersRow, error)
 	CreatePolls(ctx context.Context, arg CreatePollsParams) error
+	CreateStories(ctx context.Context, arg CreateStoriesParams) error
 	DeleteExpiredTokens(ctx context.Context) error
 	DeleteTrendingPosts(ctx context.Context, dateSUB interface{}) error
 	DeleteTrendingUsers(ctx context.Context, dateSUB interface{}) error
@@ -26,8 +27,9 @@ type Querier interface {
 	GetPolls(ctx context.Context) ([]*Poll, error)
 	GetPosts(ctx context.Context, dateSUB interface{}) ([]*GetPostsRow, error)
 	GetRating(ctx context.Context, userID int32) (int32, error)
-	GetUserComments(ctx context.Context, dateSUB interface{}) ([]*GetUserCommentsRow, error)
-	GetUserLikes(ctx context.Context, dateSUB interface{}) ([]*GetUserLikesRow, error)
+	GetStories(ctx context.Context) ([]*Story, error)
+	GetUserComments(ctx context.Context) ([]*GetUserCommentsRow, error)
+	GetUserLikes(ctx context.Context) ([]*GetUserLikesRow, error)
 	GetUsers(ctx context.Context) (int64, error)
 	InsertAdmin(ctx context.Context, arg InsertAdminParams) error
 	InsertTrending(ctx context.Context, postID int64) error
@@ -38,5 +40,3 @@ type Querier interface {
 	UpsertPostRecommendations(ctx context.Context, arg UpsertPostRecommendationsParams) error
 	UpsertUserRecommendations(ctx context.Context, arg UpsertUserRecommendationsParams) error
 }
-
-var _ Querier = (*Queries)(nil)
