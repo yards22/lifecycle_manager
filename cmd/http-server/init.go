@@ -48,27 +48,27 @@ func initRunnerManagers(app *App) {
 	querier := sqlc.New(app.db)
 
 	// token manager runner
-	d := time.Duration(app_config.Data.MustInt("duration_token") * int(time.Minute))
+	d := time.Duration(app_config.Data.MustInt("duration_token") * int(time.Hour))
 	tokenManager := token_manager.New(querier, d)
 	app.managers["tokenManager"] = tokenManager
 
 	// trending post runner
-	d = time.Duration(app_config.Data.MustInt("duration_trending_post") * int(time.Minute))
+	d = time.Duration(app_config.Data.MustInt("duration_trending_post") * int(time.Hour))
 	trendingPostsManager := t_posts_manager.New(querier, d)
 	app.managers["trendingPostsManager"] = trendingPostsManager
 
 	// trending user runner
-	d = time.Duration(app_config.Data.MustInt("duration_trending_user") * int(time.Minute))
+	d = time.Duration(app_config.Data.MustInt("duration_trending_user") * int(time.Hour))
 	trendingUserManager := t_users_manager.New(querier, d)
 	app.managers["trendingUserManager"] = trendingUserManager
 
 	// recommended user runner
-	d = time.Duration(app_config.Data.MustInt("duration_recommended_user") * int(time.Minute))
+	d = time.Duration(app_config.Data.MustInt("duration_recommended_user") * int(time.Hour))
 	recommendedUsersManager := r_users_manager.New(querier, d)
 	app.managers["recommendedUsersManager"] = recommendedUsersManager
 
 	// recommended post runner
-	d = time.Duration(app_config.Data.MustInt("duration_recommended_post") * int(time.Minute))
+	d = time.Duration(app_config.Data.MustInt("duration_recommended_post") * int(time.Hour))
 	recommendedPostsManager := r_posts_manager.New(querier, d)
 	app.managers["recommendedPostsManager"] = recommendedPostsManager
 
@@ -89,7 +89,7 @@ func initManagers(app *App) {
 func initServer(app *App) {
 	r := chi.NewRouter()
 
-	reactUri := env.ViperGetEnvVar("REACT_URI")
+	reactUri := app_config.Data.MustString("REACT_URI")
 	r.Use(cors.New(cors.Options{
 		AllowedOrigins:   []string{reactUri},
 		AllowCredentials: true,
