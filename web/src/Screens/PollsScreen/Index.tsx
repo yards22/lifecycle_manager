@@ -21,24 +21,24 @@ function PollsScreenIndex() {
            return(
              <SPollIndex>
                 <div style={{
-                  width : "100%",
-                  display : "flex",
-                  justifyContent : "flex-end"
-                }}>
-                  <Button
-                    mb={20}
-                    onClick={() => setAddPollModalOpen(true)}
-                    rightIcon = {<Plus size={20}/>}
-                  >
-                    ADD POLL
-                  </Button>
-                  <Modal
-                    opened={addPollModalOpened}
-                    onClose={() => setAddPollModalOpen(false)}
-                    title="Add A New Poll"
-                  >
-                    <AddPollModal/>
-                  </Modal>
+                    width : "100%",
+                    display : "flex",
+                    justifyContent : "flex-end"
+                  }}>
+                      <Button
+                        mb={20}
+                        onClick={() => setAddPollModalOpen(true)}
+                        rightIcon = {<Plus size={20}/>}
+                      >
+                        ADD POLL
+                      </Button>
+                      <Modal
+                        opened={addPollModalOpened}
+                        onClose={() => setAddPollModalOpen(false)}
+                        title="Add A New Poll"
+                      >
+                        <AddPollModal/>
+                      </Modal>
                 </div>
                 <PollIndex/>
                 <PollIndex/>

@@ -44,6 +44,13 @@ type ChildComment struct {
 	CreatedAt       time.Time `json:"created_at"`
 }
 
+type DraftStory struct {
+	DraftID   int32     `json:"draft_id"`
+	MailID    string    `json:"mail_id"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type Favourite struct {
 	UserID int32 `json:"user_id"`
 	PostID int64 `json:"post_id"`
@@ -133,8 +140,7 @@ type Profile struct {
 
 type Story struct {
 	StoryID   int32     `json:"story_id"`
-	UserID    int32     `json:"user_id"`
-	Title     string    `json:"title"`
+	MailID    string    `json:"mail_id"`
 	Content   string    `json:"content"`
 	Media     string    `json:"media"`
 	CreatedAt time.Time `json:"created_at"`
@@ -149,13 +155,15 @@ type Token struct {
 }
 
 type TrendingPost struct {
-	TpID   int64 `json:"tp_id"`
-	PostID int64 `json:"post_id"`
+	TpID      int64     `json:"tp_id"`
+	PostID    int64     `json:"post_id"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type TrendingUser struct {
-	TuID   int64 `json:"tu_id"`
-	UserID int32 `json:"user_id"`
+	TuID      int64     `json:"tu_id"`
+	UserID    int32     `json:"user_id"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type User struct {

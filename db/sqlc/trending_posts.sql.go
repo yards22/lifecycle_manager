@@ -43,6 +43,16 @@ func (q *Queries) CommentTrending(ctx context.Context) ([]*CommentTrendingRow, e
 	return items, nil
 }
 
+const deleteTrendingPosts = `-- name: DeleteTrendingPosts :exec
+DELETE from trending_posts 
+where created_at < DATE_SUB(NOW(),INTERVAL ? DAY)
+`
+
+func (q *Queries) DeleteTrendingPosts(ctx context.Context, dateSUB interface{}) error {
+	_, err := q.exec(ctx, q.deleteTrendingPostsStmt, deleteTrendingPosts, dateSUB)
+	return err
+}
+
 const insertTrending = `-- name: InsertTrending :exec
 INSERT INTO trending_posts (post_id) VALUES (?)
 `

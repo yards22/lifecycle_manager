@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
+	cors "github.com/rs/cors"
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
 	authservice "github.com/yards22/lcmanager/internal/auth_service"
 	"github.com/yards22/lcmanager/internal/feedback_manager"
@@ -47,32 +48,32 @@ func initRunnerManagers(app *App) {
 	querier := sqlc.New(app.db)
 
 	// token manager runner
-	d := time.Duration(app_config.Data.MustInt("duration_token") * int(time.Minute))
+	d := time.Duration(app_config.Data.MustInt("duration_token") * int(time.Hour))
 	tokenManager := token_manager.New(querier, d)
 	app.managers["tokenManager"] = tokenManager
 
 	// trending post runner
-	d = time.Duration(app_config.Data.MustInt("duration_trending_post") * int(time.Minute))
+	d = time.Duration(app_config.Data.MustInt("duration_trending_post") * int(time.Hour))
 	trendingPostsManager := t_posts_manager.New(querier, d)
 	app.managers["trendingPostsManager"] = trendingPostsManager
 
 	// trending user runner
-	d = time.Duration(app_config.Data.MustInt("duration_trending_user") * int(time.Minute))
+	d = time.Duration(app_config.Data.MustInt("duration_trending_user") * int(time.Hour))
 	trendingUserManager := t_users_manager.New(querier, d)
 	app.managers["trendingUserManager"] = trendingUserManager
 
 	// recommended user runner
-	d = time.Duration(app_config.Data.MustInt("duration_recommended_user") * int(time.Minute))
+	d = time.Duration(app_config.Data.MustInt("duration_recommended_user") * int(time.Hour))
 	recommendedUsersManager := r_users_manager.New(querier, d)
 	app.managers["recommendedUsersManager"] = recommendedUsersManager
 
 	// recommended post runner
-	d = time.Duration(app_config.Data.MustInt("duration_recommended_post") * int(time.Minute))
+	d = time.Duration(app_config.Data.MustInt("duration_recommended_post") * int(time.Hour))
 	recommendedPostsManager := r_posts_manager.New(querier, d)
 	app.managers["recommendedPostsManager"] = recommendedPostsManager
 
 	// rating runner
-	d = time.Duration(app_config.Data.MustInt("duration_rating") * int(time.Minute))
+	d = time.Duration(app_config.Data.MustInt("duration_rating") * int(time.Hour))
 	ratingManager := r_manager.New(querier, d)
 	app.managers["ratingManager"] = ratingManager
 }
@@ -87,6 +88,14 @@ func initManagers(app *App) {
 
 func initServer(app *App) {
 	r := chi.NewRouter()
+
+	reactUri := app_config.Data.MustString("REACT_URI")
+	r.Use(cors.New(cors.Options{
+		AllowedOrigins:   []string{reactUri},
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+	}).Handler)
+
 	initHandler(app, r)
 	srv := http.Server{
 		Addr:    app_config.Data.MustString("SERVER_ADDR"),

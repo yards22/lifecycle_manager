@@ -9,6 +9,7 @@ import {
   Search,
   Award,
   BarChart2,
+  Edit3,
 } from "react-feather";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -54,7 +55,7 @@ function TopBarTablet() {
         return (
           <STopBarContainer>
             <Title color={"black"} order={2}>
-              22 Yards Admin
+             Admin 22 Yards
             </Title>
             <div
               style={{
@@ -70,12 +71,27 @@ function TopBarTablet() {
                       : "gray",
                 }}
                 onClick={() => {
-                  navigate("/feed");
+                  navigate("/feedback");
                   appStore.setNavigationState(0);
                 }}
               >
-                <Home size={"20"} />
-                <Text size="xs">Home</Text>
+                <Edit3 size={"20"} />
+                <Text size="xs">Feedbacks</Text>
+              </STopBar>
+              <STopBar
+                theme={{
+                  color:
+                    appStore.navigationState === 1
+                      ? mantineTheme.colors[mantineTheme.primaryColor][7]
+                      : "gray",
+                }}
+                onClick={() => {
+                  navigate("/polls");
+                  appStore.setNavigationState(1);
+                }}
+              >
+                <BarChart2 size={"20"} />
+                <Text size="xs">Polls</Text>
               </STopBar>
               <STopBar
                 theme={{
@@ -85,86 +101,14 @@ function TopBarTablet() {
                       : "gray",
                 }}
                 onClick={() => {
-                  navigate("/explore");
+                  navigate("/stories");
                   appStore.setNavigationState(2);
                 }}
               >
-                <Globe size={"20"} />
-                <Text size="xs">Explore</Text>
-              </STopBar>
-              <STopBar
-                theme={{
-                  color:
-                    appStore.navigationState === 1
-                      ? mantineTheme.colors[mantineTheme.primaryColor][7]
-                      : "gray",
-                }}
-              >
-                <Search size={"20"} />
-                <Text size="xs">Search </Text>
-              </STopBar>
-              <STopBar
-                theme={{
-                  color:
-                    appStore.navigationState === 3
-                      ? mantineTheme.colors[mantineTheme.primaryColor][7]
-                      : "gray",
-                }}
-                onClick={() => {
-                  navigate("/notifications");
-                  appStore.setNavigationState(3);
-                }}
-              >
                 <Bell size={"20"} />
-                <Text size="xs">Notifications</Text>
-              </STopBar>
-              <STopBar
-                theme={{
-                  color:
-                    appStore.navigationState === 6
-                      ? mantineTheme.colors[mantineTheme.primaryColor][7]
-                      : "gray",
-                }}
-                onClick={() => {
-                  navigate("/polls");
-                  appStore.setNavigationState(6);
-                }}
-              >
-                <BarChart2 size={"20"} />
-                <Text size="xs">Polls</Text>
-              </STopBar>
-              <STopBar
-                theme={{
-                  color:
-                    appStore.navigationState === 5
-                      ? mantineTheme.colors[mantineTheme.primaryColor][7]
-                      : "gray",
-                }}
-                onClick={() => {
-                  navigate("/leaderBoard");
-                  appStore.setNavigationState(5);
-                }}
-              >
-                <Award size={"20"} />
-                <Text size="xs">LeaderBoard</Text>
-              </STopBar>
-              <STopBar
-                theme={{
-                  color:
-                    appStore.navigationState === 4
-                      ? mantineTheme.colors[mantineTheme.primaryColor][7]
-                      : "gray",
-                }}
-                onClick={() => {
-                  navigate("/profile");
-                  appStore.setNavigationState(4);
-                }}
-              >
-                <User size={"20"} />
-                <Text size="xs">Profile</Text>
+                <Text size="xs">Stories</Text>
               </STopBar>
             </div>
-            {/* </div> */}
           </STopBarContainer>
         );
       }}

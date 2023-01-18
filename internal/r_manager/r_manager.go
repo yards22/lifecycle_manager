@@ -8,6 +8,7 @@ import (
 	"time"
 
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
+	"github.com/yards22/lcmanager/pkg/app_config"
 	"github.com/yards22/lcmanager/pkg/runner"
 )
 
@@ -54,9 +55,11 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 		fmt.Println(err)
 	}
 
+	duration_ := app_config.Data.MustInt("duration_rating")
+
 	// score changes because of Posts...
 
-	posts, err := rm.querier.GetPosts(ctx)
+	posts, err := rm.querier.GetPosts(ctx, duration_)
 
 	if err != nil {
 		fmt.Println(err)
@@ -71,7 +74,7 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 
 	// // score changes because of followers & following .
 
-	followers, err := rm.querier.GetFollwers(ctx)
+	followers, err := rm.querier.GetFollwers(ctx, duration_)
 
 	if err != nil {
 		fmt.Println(err)
@@ -84,7 +87,7 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 		score[int(followers[follower].UserID)] += res_followers * p / i_s
 	}
 
-	following, err := rm.querier.GetFollowing(ctx)
+	following, err := rm.querier.GetFollowing(ctx, duration_)
 
 	if err != nil {
 		fmt.Println(err)
@@ -102,13 +105,13 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 	p := proportions.reactions
 	i_s := idealScores.reactions
 
-	likes, err := rm.querier.GetUserLikes(ctx)
+	likes, err := rm.querier.GetUserLikes(ctx, duration_)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	comments, err := rm.querier.GetUserComments(ctx)
+	comments, err := rm.querier.GetUserComments(ctx, duration_)
 
 	if err != nil {
 		fmt.Println(err)
@@ -166,12 +169,15 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 
 func (rm *RatingManager) RatingFunction(score float64, present_slab int32) float64 {
 
-	threshold := [9]float64{0, 5, 10, 15, 20, 25, 30, 35}
+	threshold := [10]float64{0, 5, 10, 15, 20, 25, 30, 35, 40, 45}
 
 	denom := math.Log2(float64(present_slab + 2))
+	if present_slab > 9 {
+		num := score - threshold[9]
+		return num / denom
+	}
 	num := score - threshold[present_slab]
 	return num / denom
-
 }
 
 func (rm *RatingManager) Run() {
