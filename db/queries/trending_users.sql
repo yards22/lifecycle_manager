@@ -6,7 +6,7 @@ GROUP BY posts.user_id;
 
 -- name: DeleteTrendingUsers :exec
 DELETE from trending_users
-where create_at < DATE_SUB(NOW(),INTERVAL (?) DAY);
+where created_at < DATE_SUB(NOW(),INTERVAL ? DAY);
 
 -- name: CommentTrendingUsers :many
 SELECT user_id,COUNT(post_id) as comment_count from parent_comments 
