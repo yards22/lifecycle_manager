@@ -169,12 +169,15 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 
 func (rm *RatingManager) RatingFunction(score float64, present_slab int32) float64 {
 
-	threshold := [9]float64{0, 5, 10, 15, 20, 25, 30, 35}
+	threshold := [10]float64{0, 5, 10, 15, 20, 25, 30, 35, 40, 45}
 
 	denom := math.Log2(float64(present_slab + 2))
+	if present_slab > 9 {
+		num := score - threshold[9]
+		return num / denom
+	}
 	num := score - threshold[present_slab]
 	return num / denom
-
 }
 
 func (rm *RatingManager) Run() {
