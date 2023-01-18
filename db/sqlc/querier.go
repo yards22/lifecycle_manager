@@ -28,8 +28,8 @@ type Querier interface {
 	GetPosts(ctx context.Context, dateSUB interface{}) ([]*GetPostsRow, error)
 	GetRating(ctx context.Context, userID int32) (int32, error)
 	GetStories(ctx context.Context) ([]*Story, error)
-	GetUserComments(ctx context.Context) ([]*GetUserCommentsRow, error)
-	GetUserLikes(ctx context.Context) ([]*GetUserLikesRow, error)
+	GetUserComments(ctx context.Context, dateSUB interface{}) ([]*GetUserCommentsRow, error)
+	GetUserLikes(ctx context.Context, dateSUB interface{}) ([]*GetUserLikesRow, error)
 	GetUsers(ctx context.Context) (int64, error)
 	InsertAdmin(ctx context.Context, arg InsertAdminParams) error
 	InsertTrending(ctx context.Context, postID int64) error
@@ -40,3 +40,5 @@ type Querier interface {
 	UpsertPostRecommendations(ctx context.Context, arg UpsertPostRecommendationsParams) error
 	UpsertUserRecommendations(ctx context.Context, arg UpsertUserRecommendationsParams) error
 }
+
+var _ Querier = (*Queries)(nil)

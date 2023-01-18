@@ -45,7 +45,7 @@ func (q *Queries) CommentTrendingUsers(ctx context.Context) ([]*CommentTrendingU
 
 const deleteTrendingUsers = `-- name: DeleteTrendingUsers :exec
 DELETE from trending_users
-where create_at < DATE_SUB(NOW(),INTERVAL (?) DAY)
+where created_at < DATE_SUB(NOW(),INTERVAL ? DAY)
 `
 
 func (q *Queries) DeleteTrendingUsers(ctx context.Context, dateSUB interface{}) error {

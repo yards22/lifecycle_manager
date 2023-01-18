@@ -80,6 +80,7 @@ func (tpm *TPManager) GenerateTrendingPosts(ctx context.Context) {
 		topPicks = append(topPicks, Tentries{k, CAI[k], true})
 	}
 
+	fmt.Println(topPicks)
 	// delete the trending posts except last few weeks
 
 	tpm.querier.DeleteTrendingPosts(ctx, app_config.Data.MustInt("trending_posts_lifetime"))

@@ -45,7 +45,7 @@ func (q *Queries) CommentTrending(ctx context.Context) ([]*CommentTrendingRow, e
 
 const deleteTrendingPosts = `-- name: DeleteTrendingPosts :exec
 DELETE from trending_posts 
-where create_at < DATE_SUB(NOW(),INTERVAL (?) DAY)
+where created_at < DATE_SUB(NOW(),INTERVAL ? DAY)
 `
 
 func (q *Queries) DeleteTrendingPosts(ctx context.Context, dateSUB interface{}) error {
