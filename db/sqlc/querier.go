@@ -36,6 +36,7 @@ type Querier interface {
 	InsertTrendingUsers(ctx context.Context, userID int32) error
 	LikeTrending(ctx context.Context) ([]*LikeTrendingRow, error)
 	LikeTrendingUsers(ctx context.Context) ([]*LikeTrendingUsersRow, error)
+	UpdateComments(ctx context.Context, arg UpdateCommentsParams) error
 	UpdateRating(ctx context.Context, arg UpdateRatingParams) error
 	UpsertPostRecommendations(ctx context.Context, arg UpsertPostRecommendationsParams) error
 	UpsertUserRecommendations(ctx context.Context, arg UpsertUserRecommendationsParams) error
