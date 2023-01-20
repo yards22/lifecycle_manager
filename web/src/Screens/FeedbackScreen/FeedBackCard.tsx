@@ -9,7 +9,7 @@ interface IFeedBackCard{
 
 function FeedBackCard(props:IFeedBackCard) {
   return (
-    <Card shadow="lg" p="lg" radius="md" withBorder mb={8} style={{minWidth:"300px",margin:"5px",flexGrow:"1"}}>
+    <Card shadow="lg" p="lg" radius="md" withBorder mb={8} style={{margin:"5px",flexGrow:"1"}}>
       <div style={{
         display : "flex",
         alignItems : "center",
