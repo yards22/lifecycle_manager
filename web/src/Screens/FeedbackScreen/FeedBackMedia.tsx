@@ -13,7 +13,6 @@ const SFeedPostImage = styled.img`
 
 function FeedBackMedia(props: NormalPostMediaProps) {
   const stores = useStores();
-  console.log("in feedback media",props.media)
   return (
     <div
       style={{
