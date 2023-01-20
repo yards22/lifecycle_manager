@@ -105,4 +105,4 @@ function FeedBackCard(props: IFeedBackCard) {
   );
 }
 
-export default FeedBackCard;
+export default FeedBackCard
