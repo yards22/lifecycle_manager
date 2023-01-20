@@ -1,6 +1,6 @@
 import { Button, Modal } from '@mantine/core';
 import { Observer } from 'mobx-react-lite'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import PollIndex from './Poll/Index';
 import { Plus } from 'react-feather';
@@ -21,6 +21,9 @@ const SPollWrapContainer = styled.div`
 function PollsScreenIndex() {
   const [addPollModalOpened , setAddPollModalOpen] = useState(false)
   const stores = useStores();
+  useEffect(()=>{
+    stores.pollsStore.GetPolls(stores.authStore.token ? stores.authStore.token:"")
+  },[])
   return (
     <Observer>
        {
