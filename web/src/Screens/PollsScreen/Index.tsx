@@ -5,19 +5,27 @@ import styled from 'styled-components';
 import PollIndex from './Poll/Index';
 import { Plus } from 'react-feather';
 import AddPollModal from './AddPollModal';
+import { useStores } from '../../Logic/Providers/StateProvider';
 
 const SPollIndex = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
+  flex-direction: column;
+  width: 100%;
+`
+const SPollWrapContainer = styled.div`
+  display: grid;
+  grid-template-columns: ${(p)=> p.theme.deviceWidth > 1600 ? "auto auto auto": p.theme.deviceWidth < 800 ? "auto":"auto auto"};
+  width: 100%;
 `
 
 function PollsScreenIndex() {
   const [addPollModalOpened , setAddPollModalOpen] = useState(false)
+  const stores = useStores();
   return (
     <Observer>
        {
          () =>{
+           const {appStore} = stores
            return(
              <SPollIndex>
                 <div style={{
@@ -40,11 +48,13 @@ function PollsScreenIndex() {
                         <AddPollModal/>
                       </Modal>
                 </div>
-                <PollIndex/>
-                <PollIndex/>
-                <PollIndex/>
-                <PollIndex/>
-                <PollIndex/>
+                <SPollWrapContainer theme={{deviceWidth : appStore.deviceWidth}}>
+                  <PollIndex/>
+                  <PollIndex/>
+                  <PollIndex/>
+                  <PollIndex/>
+                  <PollIndex/>
+                </SPollWrapContainer>
              </SPollIndex>
            )
          }

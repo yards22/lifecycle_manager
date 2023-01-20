@@ -6,11 +6,10 @@ import { useStores } from "../../../Logic/Providers/StateProvider";
 import PollButtons from "./PollButtons";
 const SEventsIndex = styled.div`
   height: 100%;
-  /* width: ${(p)=>p.theme.widthOfContainer > 1050 ? "45%": "95%"}; */
-  width: 100%;
   position: relative;
   overflow: hidden;
-  margin-bottom: 20px;
+  margin: 5px;
+  flex-grow: 1;
 `;
 
 
@@ -44,19 +43,7 @@ function PollCardIndex() {
       {
         ()=>{
           return(
-            // <Indicator 
-            //   style={{
-            //      width : stores.appStore.deviceWidth > 1050 ? "45%": "95%",
-            //   }}
-            //   color = "red"
-            //   label = {<X size={20} onClick={handleDeleteAPoll} style={{cursor:"pointer"}}/>}
-            //   size = {29}
-            // >
-               <SEventsIndex 
-                  theme={{
-                    widthOfContainer : stores.appStore.deviceWidth
-                  }}
-                >
+               <SEventsIndex>
                   <Card shadow="lg" p="lg" withBorder style={{ padding: "0" }}>
                     <Flag>Poll</Flag>
                     <div
@@ -83,7 +70,6 @@ function PollCardIndex() {
                     </div>
                   </Card>
               </SEventsIndex>
-            // </Indicator>
           )
         }
       }
