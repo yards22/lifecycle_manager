@@ -109,6 +109,7 @@ func (app *App) checkAllowance(next http.Handler) http.HandlerFunc {
 
 		authHeader := r.Header.Get("Authorization")
 		token := BearerAuthHeader(authHeader)
+		fmt.Println("from polls ", token)
 		if token != "" {
 			categories := app.authService.CheckSession(r.Context(), token)
 			if categories != nil {
@@ -119,12 +120,14 @@ func (app *App) checkAllowance(next http.Handler) http.HandlerFunc {
 				for i := 1; i < len(categories); i++ {
 
 					if categories[i] == "polls" {
+						fmt.Println("In polls")
 						x.Polls = true
 					}
 					if categories[i] == "stories" {
 						x.Stories = true
 					}
 					if categories[i] == "feedback" {
+						fmt.Println("In feedback")
 						x.Feedback = true
 					}
 				}
