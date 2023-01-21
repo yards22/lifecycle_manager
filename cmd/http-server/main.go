@@ -10,6 +10,7 @@ import (
 	"github.com/yards22/lcmanager/internal/feedback_manager"
 	"github.com/yards22/lcmanager/internal/manager"
 	"github.com/yards22/lcmanager/internal/poll_manager"
+	"github.com/yards22/lcmanager/pkg/mailer"
 	objectstore "github.com/yards22/lcmanager/pkg/object_store"
 )
 
@@ -23,6 +24,7 @@ type App struct {
 	srv             *http.Server
 	authService     *authservice.AuthService
 	objectStore     objectstore.ObjectStore
+	mailer          *mailer.GoMail
 }
 
 var (
@@ -49,6 +51,7 @@ func main() {
 	}
 	initManagers(app)
 	initServer(app)
+	initMailer(app)
 	initAuthService(app)
 	initObjectStore(app)
 	app.logger.Println("app running on", app.srv.Addr)

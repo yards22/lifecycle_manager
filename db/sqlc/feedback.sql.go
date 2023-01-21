@@ -7,10 +7,12 @@ package db
 
 import (
 	"context"
+
+	null "gopkg.in/guregu/null.v4"
 )
 
 const getFeedback = `-- name: GetFeedback :many
-SELECT feedback_id, user_id, image_uri, content from feedback
+SELECT feedback_id,user_id,image_uri,content,created_at,status,comment from feedback
 `
 
 func (q *Queries) GetFeedback(ctx context.Context) ([]*Feedback, error) {
@@ -27,6 +29,9 @@ func (q *Queries) GetFeedback(ctx context.Context) ([]*Feedback, error) {
 			&i.UserID,
 			&i.ImageUri,
 			&i.Content,
+			&i.CreatedAt,
+			&i.Status,
+			&i.Comment,
 		); err != nil {
 			return nil, err
 		}
@@ -39,4 +44,20 @@ func (q *Queries) GetFeedback(ctx context.Context) ([]*Feedback, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateComments = `-- name: UpdateComments :exec
+UPDATE feedback SET status = (?),comment = (?)
+WHERE feedback_id = (?)
+`
+
+type UpdateCommentsParams struct {
+	Status     bool        `json:"status"`
+	Comment    null.String `json:"comment"`
+	FeedbackID int64       `json:"feedback_id"`
+}
+
+func (q *Queries) UpdateComments(ctx context.Context, arg UpdateCommentsParams) error {
+	_, err := q.exec(ctx, q.updateCommentsStmt, updateComments, arg.Status, arg.Comment, arg.FeedbackID)
+	return err
 }

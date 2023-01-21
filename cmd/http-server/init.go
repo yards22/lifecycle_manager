@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -20,6 +21,7 @@ import (
 	"github.com/yards22/lcmanager/internal/token_manager"
 	"github.com/yards22/lcmanager/pkg/app_config"
 	kvstore "github.com/yards22/lcmanager/pkg/kv_store"
+	"github.com/yards22/lcmanager/pkg/mailer"
 	objectstore "github.com/yards22/lcmanager/pkg/object_store"
 )
 
@@ -90,9 +92,12 @@ func initServer(app *App) {
 	r := chi.NewRouter()
 
 	reactUri := app_config.Data.MustString("REACT_URI")
+
 	r.Use(cors.New(cors.Options{
 		AllowedOrigins:   []string{reactUri},
 		AllowCredentials: true,
+		AllowedHeaders:   []string{"Accept", "Content-Type", "Content-Length", "Accept-Encoding", "Authorization", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Authorization"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
 	}).Handler)
 
@@ -105,7 +110,8 @@ func initServer(app *App) {
 }
 
 func initAuthService(app *App) {
-	app.authService = authservice.New(kvstore.New(), sqlc.New(app.db))
+	//  	mailer, err := mailer.NewGoMail("smtpout.secureserver.net", 587, "contact@22yardz.in", "JEvrW59syf5v9tc", true)
+	app.authService = authservice.New(kvstore.New(), sqlc.New(app.db), app.mailer)
 }
 
 func initObjectStore(app *App) {
@@ -118,4 +124,12 @@ func initObjectStore(app *App) {
 		panic(err)
 	}
 	app.objectStore = objectStore
+}
+
+func initMailer(app *App) {
+	mailer, err := mailer.NewGoMail(app_config.Data.MustString("MAIL_HOST"), app_config.Data.MustInt("MAIL_PORT"), app_config.Data.MustString("MAIL_ID"), app_config.Data.MustString("MAIL_PASSWORD"), true)
+	if err != nil {
+		fmt.Println(err)
+	}
+	app.mailer = mailer
 }
