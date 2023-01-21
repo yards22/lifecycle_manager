@@ -105,6 +105,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.likeTrendingUsersStmt, err = db.PrepareContext(ctx, likeTrendingUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query LikeTrendingUsers: %w", err)
 	}
+	if q.updateCommentsStmt, err = db.PrepareContext(ctx, updateComments); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateComments: %w", err)
+	}
 	if q.updateRatingStmt, err = db.PrepareContext(ctx, updateRating); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateRating: %w", err)
 	}
@@ -254,6 +257,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing likeTrendingUsersStmt: %w", cerr)
 		}
 	}
+	if q.updateCommentsStmt != nil {
+		if cerr := q.updateCommentsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateCommentsStmt: %w", cerr)
+		}
+	}
 	if q.updateRatingStmt != nil {
 		if cerr := q.updateRatingStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateRatingStmt: %w", cerr)
@@ -335,6 +343,7 @@ type Queries struct {
 	insertTrendingUsersStmt       *sql.Stmt
 	likeTrendingStmt              *sql.Stmt
 	likeTrendingUsersStmt         *sql.Stmt
+	updateCommentsStmt            *sql.Stmt
 	updateRatingStmt              *sql.Stmt
 	upsertPostRecommendationsStmt *sql.Stmt
 	upsertUserRecommendationsStmt *sql.Stmt
@@ -371,6 +380,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		insertTrendingUsersStmt:       q.insertTrendingUsersStmt,
 		likeTrendingStmt:              q.likeTrendingStmt,
 		likeTrendingUsersStmt:         q.likeTrendingUsersStmt,
+		updateCommentsStmt:            q.updateCommentsStmt,
 		updateRatingStmt:              q.updateRatingStmt,
 		upsertPostRecommendationsStmt: q.upsertPostRecommendationsStmt,
 		upsertUserRecommendationsStmt: q.upsertUserRecommendationsStmt,

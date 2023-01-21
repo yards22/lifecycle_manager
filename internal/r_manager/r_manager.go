@@ -159,6 +159,10 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 
 		updated_index := get_rating + int32(rm.RatingFunction(score[user], (get_rating/200)))
 
+		log.Println("rating_uses_id_", user, " prev ", get_rating, " updated ", updated_index)
+		log.Println("rating_user_id_", user, " score ", score[user])
+		log.Println("rating_user_id_", user, " slab ", get_rating/200)
+
 		rm.querier.UpdateRating(ctx, sqlc.UpdateRatingParams{
 			CricIndex: updated_index,
 			UserID:    int32(user),

@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	null "gopkg.in/guregu/null.v4"
 )
 
 type NotificationsStatus string
@@ -57,10 +59,13 @@ type Favourite struct {
 }
 
 type Feedback struct {
-	FeedbackID int64          `json:"feedback_id"`
-	UserID     int32          `json:"user_id"`
-	ImageUri   sql.NullString `json:"image_uri"`
-	Content    sql.NullString `json:"content"`
+	FeedbackID int64       `json:"feedback_id"`
+	UserID     int32       `json:"user_id"`
+	ImageUri   null.String `json:"image_uri"`
+	Content    null.String `json:"content"`
+	CreatedAt  time.Time   `json:"created_at"`
+	Status     bool        `json:"status"`
+	Comment    null.String `json:"comment"`
 }
 
 type Like struct {
