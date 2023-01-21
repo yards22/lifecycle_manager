@@ -1,21 +1,33 @@
 import { action, makeAutoObservable, observable } from "mobx";
 import { PollsRepo } from "../Repository/PollsRepo";
+import { MPolls } from "../Model/MPolls";
 
 export class PollsStore{
     @observable isLoading:boolean = false
-    @observable pollsArray : any[] = []
+    @observable pollsArray : MPolls[]|null = []
+    @observable token: string | null = null;
     pollsRepo:PollsRepo
 
     constructor(pollsRepo:PollsRepo){
         makeAutoObservable(this)
         this.pollsRepo = pollsRepo
+        this.token = window.localStorage.getItem("token")
     }
 
     @action
-    GetPolls = async (token:string)=>{
+    SetPollsArray = (x: MPolls[] | null) => {
+      if (x !== null){
+        this.pollsArray = x
+      }
+    };
+
+    @action
+    GetPolls = async ()=>{
         try {
-            const response = await this.pollsRepo.getPolls(token);
-            console.log("get polls response",response)
+            const {polls} = await this.pollsRepo.getPolls(this.token || "");
+           this.pollsArray = polls
+           console.log(polls);
+           
         } catch (error) {
             throw error
         }

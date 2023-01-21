@@ -1,6 +1,7 @@
 import { useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
 import styled from "styled-components";
+import { MPollButton } from "../../Logic/Model/MPolls";
 interface PollButtonsProps {
   buttons: { title: string; votes: number }[];
 }
@@ -34,7 +35,7 @@ const PercentageBackground = styled.div`
   font-size: 15px;
 `;
 
-function PollButtons(props: PollButtonsProps) {
+function PollButtons(props: MPollButton) {
   const { colors } = useMantineTheme();
   const totalVotes = useMemo(() => {
     let temp = 0;
@@ -45,10 +46,8 @@ function PollButtons(props: PollButtonsProps) {
   }, [props.buttons]);
   return (
     <>
-      {props.buttons.map((item, index) => {
-        return (
-          <MainBox
-            key={index}
+       <MainBox
+            // key={props.poll.}
             style={{
               border: "1px dashed " + colors.blue[5],
               color: colors.blue[8],
@@ -60,19 +59,17 @@ function PollButtons(props: PollButtonsProps) {
                 background: colors.blue[1],
                 color: colors.blue[9],
               }}
-              theme={{
-                percentage:
-                  (item.votes / totalVotes) * 100 ,
-              }}
+              // theme={{
+              //   percentage:
+              //     (props.polls.votes / totalVotes) * 100 ,
+              // }}
             />
             <p style={{ zIndex: "3", position: "absolute", left: "10px" }}>
-              {item.title}
+              {props.poll.title}
               {"  "}
               {  `(${Math.round((item.votes / totalVotes) * 100)+"%"})`}
             </p>
           </MainBox>
-        );
-      })}
     </>
   );
 }

@@ -1,5 +1,6 @@
-import { AuthHeadersWithToken } from "../Utils/AuthHeaders";
+import { AuthHeaders, AuthHeadersWithToken } from "../Utils/AuthHeaders";
 import { Request } from "../Utils/Fetch";
+import { CheckResponse } from "../Utils/ResponseHandler";
 
 export class PollsRepo{
     baseUrl: string;
@@ -12,9 +13,12 @@ export class PollsRepo{
 
     async getPolls(token:string){
         try {
-            const response = await this.rq.Get(this.baseUrl,AuthHeadersWithToken(token));
-            const res = response.json();
-            return res
+            console.log(token);
+            const response = await this.rq.Get(this.baseUrl,AuthHeaders(token));
+            const {body} = await CheckResponse(response,200)
+            return {
+                polls:body.data
+            }
         } catch (error) {
             throw error
         }
@@ -22,7 +26,7 @@ export class PollsRepo{
 
     async addPoll(poll_question:string, options:string[], token:string){
         try{
-            const response = await this.rq.Post(this.baseUrl,{poll_question,options_count:options.length,options },AuthHeadersWithToken(token));
+            const response = await this.rq.Post(this.baseUrl,{poll_question,options_count:options.length,options },AuthHeaders(token));
             const res = response.json();
             return res
         }catch(error){
