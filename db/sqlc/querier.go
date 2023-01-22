@@ -9,8 +9,8 @@ import (
 )
 
 type Querier interface {
-	CommentTrending(ctx context.Context) ([]*CommentTrendingRow, error)
-	CommentTrendingUsers(ctx context.Context) ([]*CommentTrendingUsersRow, error)
+	CommentTrending(ctx context.Context, dateSUB interface{}) ([]*CommentTrendingRow, error)
+	CommentTrendingUsers(ctx context.Context, dateSUB interface{}) ([]*CommentTrendingUsersRow, error)
 	CreatePolls(ctx context.Context, arg CreatePollsParams) error
 	CreateStories(ctx context.Context, arg CreateStoriesParams) error
 	DeleteExpiredTokens(ctx context.Context) error
@@ -34,8 +34,8 @@ type Querier interface {
 	InsertAdmin(ctx context.Context, arg InsertAdminParams) error
 	InsertTrending(ctx context.Context, postID int64) error
 	InsertTrendingUsers(ctx context.Context, userID int32) error
-	LikeTrending(ctx context.Context) ([]*LikeTrendingRow, error)
-	LikeTrendingUsers(ctx context.Context) ([]*LikeTrendingUsersRow, error)
+	LikeTrending(ctx context.Context, dateSUB interface{}) ([]*LikeTrendingRow, error)
+	LikeTrendingUsers(ctx context.Context, dateSUB interface{}) ([]*LikeTrendingUsersRow, error)
 	UpdateComments(ctx context.Context, arg UpdateCommentsParams) error
 	UpdateRating(ctx context.Context, arg UpdateRatingParams) error
 	UpsertPostRecommendations(ctx context.Context, arg UpsertPostRecommendationsParams) error

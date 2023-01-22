@@ -50,32 +50,32 @@ func initRunnerManagers(app *App) {
 	querier := sqlc.New(app.db)
 
 	// token manager runner
-	d := time.Duration(app_config.Data.MustInt("duration_token") * int(time.Hour))
+	d := time.Duration(app_config.Data.MustInt("duration_token") * int(time.Minute))
 	tokenManager := token_manager.New(querier, d)
 	app.managers["tokenManager"] = tokenManager
 
 	// trending post runner
-	d = time.Duration(app_config.Data.MustInt("duration_trending_post") * int(time.Hour))
+	d = time.Duration(app_config.Data.MustInt("duration_trending_post") * int(time.Minute))
 	trendingPostsManager := t_posts_manager.New(querier, d)
 	app.managers["trendingPostsManager"] = trendingPostsManager
 
 	// trending user runner
-	d = time.Duration(app_config.Data.MustInt("duration_trending_user") * int(time.Hour))
+	d = time.Duration(app_config.Data.MustInt("duration_trending_user") * int(time.Minute))
 	trendingUserManager := t_users_manager.New(querier, d)
 	app.managers["trendingUserManager"] = trendingUserManager
 
 	// recommended user runner
-	d = time.Duration(app_config.Data.MustInt("duration_recommended_user") * int(time.Hour))
+	d = time.Duration(app_config.Data.MustInt("duration_recommended_user") * int(time.Minute))
 	recommendedUsersManager := r_users_manager.New(querier, d)
 	app.managers["recommendedUsersManager"] = recommendedUsersManager
 
 	// recommended post runner
-	d = time.Duration(app_config.Data.MustInt("duration_recommended_post") * int(time.Hour))
+	d = time.Duration(app_config.Data.MustInt("duration_recommended_post") * int(time.Minute))
 	recommendedPostsManager := r_posts_manager.New(querier, d)
 	app.managers["recommendedPostsManager"] = recommendedPostsManager
 
 	// rating runner
-	d = time.Duration(app_config.Data.MustInt("duration_rating") * int(time.Hour))
+	d = time.Duration(app_config.Data.MustInt("duration_rating") * int(time.Minute))
 	ratingManager := r_manager.New(querier, d)
 	app.managers["ratingManager"] = ratingManager
 }
