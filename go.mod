@@ -2,7 +2,7 @@ module github.com/yards22/lcmanager
 
 go 1.19
 
-require github.com/aws/aws-sdk-go v1.44.179
+require github.com/aws/aws-sdk-go v1.44.210
 
 require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect

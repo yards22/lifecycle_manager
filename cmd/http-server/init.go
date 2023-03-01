@@ -6,6 +6,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
 	cors "github.com/rs/cors"
@@ -42,6 +46,21 @@ func initDB(app *App) {
 	app.db = db
 	app.logger.Println("connected to db")
 
+}
+
+func initKVDB(app *App) {
+	sess := session.Must(session.NewSession())
+	db := dynamodb.New(sess, &aws.Config{
+		Region:      aws.String(app_config.Data.MustString("Dynamo_Region")),
+		Credentials: credentials.NewStaticCredentials("AKIAUZAIJPCMOYOR7ZEN", "HU9drLbe1E90lORcPlfDIsPlaxngAFuh+M3QbCqF", ""),
+	})
+	app.kvdb = db
+	tables, err := db.ListTables(&dynamodb.ListTablesInput{})
+	if err != nil {
+		panic(err)
+	}
+	app.logger.Println(tables)
+	app.logger.Println("connected to kvDB")
 }
 
 func initRunnerManagers(app *App) {

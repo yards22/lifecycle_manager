@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	authservice "github.com/yards22/lcmanager/internal/auth_service"
 	"github.com/yards22/lcmanager/internal/feedback_manager"
 	"github.com/yards22/lcmanager/internal/manager"
@@ -15,7 +16,9 @@ import (
 )
 
 type App struct {
-	db *sql.DB
+	db   *sql.DB
+	kvdb *dynamodb.DynamoDB
+
 	// redis           *redis.Client
 	logger          *log.Logger
 	PollManager     *poll_manager.PollManager
@@ -45,6 +48,7 @@ func main() {
 	}
 
 	initDB(app)
+	initKVDB(app)
 	initRunnerManagers(app)
 	for _, v := range app.managers {
 		go v.Run()
