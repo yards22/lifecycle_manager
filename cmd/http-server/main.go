@@ -49,6 +49,7 @@ func main() {
 
 	initDB(app)
 	initKVDB(app)
+	initConsumer(app)
 	initRunnerManagers(app)
 	for _, v := range app.managers {
 		go v.Run()

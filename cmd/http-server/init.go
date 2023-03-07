@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
 	cors "github.com/rs/cors"
+	"github.com/streadway/amqp"
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
 	authservice "github.com/yards22/lcmanager/internal/auth_service"
 	"github.com/yards22/lcmanager/internal/feedback_manager"
@@ -20,6 +21,7 @@ import (
 	"github.com/yards22/lcmanager/internal/r_manager"
 	"github.com/yards22/lcmanager/internal/r_posts_manager"
 	"github.com/yards22/lcmanager/internal/r_users_manager"
+	scoremanager "github.com/yards22/lcmanager/internal/score_manager"
 	"github.com/yards22/lcmanager/internal/t_posts_manager"
 	"github.com/yards22/lcmanager/internal/t_users_manager"
 	"github.com/yards22/lcmanager/internal/token_manager"
@@ -32,6 +34,17 @@ import (
 type Author struct {
 	Name string `json:"name"`
 	Age  int    `json:"age"`
+}
+
+type Summary struct {
+	MatchId  string   `json:"match_id"`
+	DataType string   `json:"data_type"`
+	Score    []string `json:"Score"`
+}
+
+type Record struct {
+	ID   string
+	URLs []string
 }
 
 func initDB(app *App) {
@@ -54,12 +67,82 @@ func initKVDB(app *App) {
 		Region:      aws.String(app_config.Data.MustString("Dynamo_Region")),
 		Credentials: credentials.NewStaticCredentials("AKIAUZAIJPCMOYOR7ZEN", "HU9drLbe1E90lORcPlfDIsPlaxngAFuh+M3QbCqF", ""),
 	})
+
+	// client := asynq.NewClient(asynq.RedisClientOpt{
+	// 	Addr:     "localhost:6379",
+	// 	Password: "",
+	// 	DB:       0,
+	// })
+
 	app.kvdb = db
-	tables, err := db.ListTables(&dynamodb.ListTablesInput{})
-	if err != nil {
-		panic(err)
-	}
-	app.logger.Println(tables)
+	// tables, err := db.ListTables(&dynamodb.ListTablesInput{})
+
+	// input := &dynamodb.GetItemInput{
+	// 	Key: map[string]*dynamodb.AttributeValue{
+	// 		"match_id": {
+	// 			S: aws.String("match_2"),
+	// 		},
+	// 		"data_type": {
+	// 			S: aws.String("match_2_raw"),
+	// 		},
+	// 	},
+	// 	TableName: aws.String("IMatches"),
+	// }
+
+	// out, err := db.GetItem(input)
+
+	// in, err := db.PutItem(&dynamodb.PutItemInput{
+	// 	TableName: aws.String("IMatches"),
+	// 	Item: map[string]*dynamodb.AttributeValue{
+	// 		"match_id": {
+	// 			S: aws.String("match_2"),
+	// 		},
+	// 		"data_type": {
+	// 			S: aws.String("match_2_commentry"),
+	// 		},
+	// 		"Score": {
+	// 			L: []*dynamodb.AttributeValue{
+	// 				{
+	// 					M: map[string]*dynamodb.AttributeValue{
+	// 						"plate": {S: aws.String("test")},
+	// 						"spoon": {
+	// 							M: map[string]*dynamodb.AttributeValue{
+	// 								"solid": {S: aws.String("rice")},
+	// 							},
+	// 						},
+	// 					},
+	// 				},
+	// 			},
+	// 		},
+	// 	},
+	// })
+	// r := Summary{
+	// 	MatchId:  "match_2",
+	// 	DataType: "match_2_commentry",
+	// 	Score: []string{
+	// 		"https://example.com/first/link",
+	// 		"https://example.com/second/url",
+	// 	},
+	// }
+	// av, err := dynamodbattribute.MarshalMap(r)
+	// if err != nil {
+	// 	panic(fmt.Sprintf("failed to DynamoDB marshal Record, %v", err))
+	// }
+
+	// _, err = db.PutItem(&dynamodb.PutItemInput{
+	// 	TableName: aws.String("IMatches"),
+	// 	Item:      av,
+	// })
+	// if err != nil {
+	// 	panic(fmt.Sprintf("failed to put Record to DynamoDB, %v", err))
+	// }
+
+	// fmt.Println("retrived data ", out)
+	// fmt.Println("inserted_data ", in)
+
+	// if err != nil {
+	// 	panic(err)
+	// }
 	app.logger.Println("connected to kvDB")
 }
 
@@ -97,6 +180,23 @@ func initRunnerManagers(app *App) {
 	d = time.Duration(app_config.Data.MustInt("duration_rating") * int(time.Minute))
 	ratingManager := r_manager.New(querier, d)
 	app.managers["ratingManager"] = ratingManager
+}
+
+func initConsumer(app *App) {
+	conn, err := amqp.Dial("amqps://qwiynkfq:pEcA9NfiesS0wIbNrGewvVjIrqMmO4v4@puffin.rmq2.cloudamqp.com/qwiynkfq")
+	if err != nil {
+		fmt.Println("Failed Initializing Broker Connection")
+		panic(err)
+	}
+	fmt.Println("Initializing Broker Connection")
+	ch, err := conn.Channel()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	scoreManager := scoremanager.New(app.kvdb, ch)
+	app.managers["score_manager"] = scoreManager
+
 }
 
 func initManagers(app *App) {
