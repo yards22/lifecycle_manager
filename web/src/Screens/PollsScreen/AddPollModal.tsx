@@ -2,6 +2,7 @@ import { Button, Input, Textarea } from '@mantine/core'
 import { useState } from 'react'
 import {  Trash2 } from 'react-feather';
 import styled from 'styled-components'
+import { useStores } from '../../Logic/Providers/StateProvider';
 
 
 const SAddPollModal = styled.div`
@@ -13,6 +14,7 @@ const SAddPollModal = styled.div`
 function AddPollModal() {
   const [pollOptions , setPollOptions] = useState<string[]>([""]);
   const [pollQuestion, setPollQuestion] = useState("")
+  const {pollsStore,authStore} = useStores();
 
   function handleOnChangeOfOptions(option:string,index:number){
      let w = pollOptions;
@@ -33,6 +35,7 @@ function AddPollModal() {
   function handleSubmitThePoll(){
     console.log("Question",pollQuestion);
     console.log("options",pollOptions)
+    pollsStore.AddPoll(pollQuestion,pollOptions, authStore.token?authStore.token:"")
   }
 
   return (

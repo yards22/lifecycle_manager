@@ -5,9 +5,11 @@ import styled from 'styled-components';
 import { StoresContext } from './Logic/Providers/StateProvider';
 import { AuthRepo } from './Logic/Repository/AuthRepo';
 import { FeedBackRepo } from './Logic/Repository/FeedBackRepo';
+import { PollsRepo } from './Logic/Repository/PollsRepo';
 import AppStore from './Logic/State/AppStore'
 import { AuthStore } from './Logic/State/AuthStore';
 import { FeedBackStore } from './Logic/State/FeedBackStore';
+import { PollsStore } from './Logic/State/PollsStore';
 import { Request } from './Logic/Utils/Fetch';
 
 const SProvidedApp = styled.div`
@@ -27,6 +29,7 @@ function ProvidedApp(props:ProvidedAppProps) {
   const appStore = new AppStore();
   const authStore = new AuthStore(new AuthRepo(BASE_URL,rq))
   const feedBackStore = new FeedBackStore(new FeedBackRepo(BASE_URL+"/feedback",BASE_URL_FOR_IMAGES,rq))
+  const pollsStore = new PollsStore(new PollsRepo(BASE_URL+"/poll",rq))
 
   return (
     <SProvidedApp>
@@ -34,7 +37,8 @@ function ProvidedApp(props:ProvidedAppProps) {
         value={{
           appStore,
           feedBackStore,
-          authStore
+          authStore,
+          pollsStore
         }}
       >
         { 

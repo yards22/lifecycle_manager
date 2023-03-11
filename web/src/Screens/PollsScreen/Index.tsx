@@ -1,51 +1,48 @@
 import { Button, Modal } from '@mantine/core';
 import { Observer } from 'mobx-react-lite'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components';
-import PollIndex from './Poll/Index';
+import PollIndex from './PollCards';
 import { Plus } from 'react-feather';
 import AddPollModal from './AddPollModal';
+import { useStores } from '../../Logic/Providers/StateProvider';
+import AddPoll from './AddPoll';
+import PollCards from './PollCards';
 
 const SPollIndex = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
+  flex-direction: column;
+  width: 100%;
+`
+const SPollWrapContainer = styled.div`
+  display: grid;
+  grid-template-columns: ${(p)=> p.theme.deviceWidth > 1600 ? "auto auto auto": p.theme.deviceWidth < 800 ? "auto":"auto auto"};
+  width: 100%;
 `
 
 function PollsScreenIndex() {
-  const [addPollModalOpened , setAddPollModalOpen] = useState(false)
+  const stores = useStores();
   return (
     <Observer>
        {
          () =>{
-           return(
-             <SPollIndex>
-                <div style={{
-                    width : "100%",
-                    display : "flex",
-                    justifyContent : "flex-end"
-                  }}>
-                      <Button
-                        mb={20}
-                        onClick={() => setAddPollModalOpen(true)}
-                        rightIcon = {<Plus size={20}/>}
-                      >
-                        ADD POLL
-                      </Button>
-                      <Modal
-                        opened={addPollModalOpened}
-                        onClose={() => setAddPollModalOpen(false)}
-                        title="Add A New Poll"
-                      >
-                        <AddPollModal/>
-                      </Modal>
-                </div>
-                <PollIndex/>
-                <PollIndex/>
-                <PollIndex/>
-                <PollIndex/>
-                <PollIndex/>
-             </SPollIndex>
+           const {appStore,pollsStore} = stores
+           if (pollsStore.pollsArray?.length){
+             return(
+               <SPollIndex>
+                  <AddPoll/>
+                  <SPollWrapContainer theme={{deviceWidth : appStore.deviceWidth}}>
+                     {
+                      pollsStore.pollsArray.map((item,index)=>
+                         <PollCards polls={item} key={`normal_post_${index}`}/>
+                      )
+                     }
+                  </SPollWrapContainer>
+               </SPollIndex>
+             )
+           }
+           return (
+             <p>No Polls</p>
            )
          }
        }
