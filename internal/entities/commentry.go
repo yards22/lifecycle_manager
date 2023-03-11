@@ -23,7 +23,7 @@ type Wicket struct {
 	WicketType        string   `json:"wicket_type"`
 	StrikerBatsman    IBatsman `json:"striker_batsman"`
 	NonStrikerBatsman IBatsman `json:"non_striker_batsman"`
-	Bowler            string   `json:"bowler"`
+	Bowler            IBowler  `json:"bowler"`
 	RunsScored        int      `json:"runs_scored"`
 	WagonDirection    string   `json:"wagon_direction,omitempty"`
 	IsFielder         bool     `json:"is_fielder,omitempty"`
@@ -67,7 +67,7 @@ type Runs struct {
 	RunsScored        int      `json:"runs_scored"`
 	StrikerBatsman    IBatsman `json:"striker_batsman"`
 	NonStrikerBatsman IBatsman `json:"non_striker_batsman"`
-	Bowler            string   `json:"bowler"`
+	Bowler            IBowler  `json:"bowler"`
 	IsBoundary        bool     `json:"is_boundary"`
 	BoundaryType      string   `json:"boundary_type,omitempty"`
 	WagonDirection    string   `json:"wagon_direction,omitempty"`
@@ -97,7 +97,7 @@ type Extra struct {
 	ExtraType         string   `json:"extra_type,omitempty"`
 	StrikerBatsman    IBatsman `json:"striker_batsman"`
 	NonStrikerBatsman IBatsman `json:"non_striker_batsman"`
-	Bowler            string   `json:"bowler"`
+	Bowler            IBowler  `json:"bowler"`
 }
 
 func (E *Extra) ExtraC() CommentryF {

@@ -17,9 +17,21 @@ type Summary struct {
 	Score    entities.ScoreItem `json:"Score"`
 }
 
+type GetEntry struct {
+	MatchId  string `json:"match_id"`
+	DataType string `json:"data_type"`
+}
+
 type ScoreManager struct {
 	dynamodb *dynamodb.DynamoDB
 	ch       *amqp.Channel
+}
+
+func Max(x, y int) int {
+	if x < y {
+		return y
+	}
+	return x
 }
 
 func New(dynamodb *dynamodb.DynamoDB, ch *amqp.Channel) *ScoreManager {
@@ -57,6 +69,12 @@ func (sm *ScoreManager) Close() {
 func (sm *ScoreManager) process(d amqp.Delivery) {
 	var s entities.ScoreItem
 	json.Unmarshal(d.Body, &s)
+
+	if s.Undo {
+
+		return
+	}
+
 	r := Summary{
 		MatchId:  s.MatchId,
 		DataType: s.MatchId + "_raw",
@@ -72,12 +90,62 @@ func (sm *ScoreManager) process(d amqp.Delivery) {
 		TableName: aws.String("IMatches"),
 		Item:      av,
 	})
+
+	sm.generateCommentry_1(s)
+
 	if err != nil {
 		panic(fmt.Sprintf("failed to put Record to DynamoDB, %v", err))
 	}
 }
 
-func (sm *ScoreManager) generateCommentry(raw entities.ScoreItem) entities.CommentryF {
+func (sm *ScoreManager) generateCommentry_1(raw entities.ScoreItem) {
+	// get the prev match status (network call)
+
+	k := &dynamodb.GetItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"match_id": {
+				S: aws.String("match_2"),
+			},
+			"data_type": {
+				S: aws.String("match_2_commentry"),
+			},
+		},
+		TableName: aws.String("IMatches"),
+	}
+
+	data, err := sm.dynamodb.GetItem(k)
+
+	if err != nil {
+		panic(err)
+	}
+	S := data.Item["score"].L
+	//TODO: load S into commentry array as the schema presently is not proper in the table doing this dummy thing.
+	var commentryArray []entities.CommentryF
+	fmt.Println(S)
+
+	var SS entities.ScoreSummary
+
+	// have cur_batsmen score details .....
+	SS.StrikerBatsman = raw.PlayersInAction.StrikerBatsman
+	SS.NonStrikerBatsman = raw.PlayersInAction.NonStrikerBatsman
+	if raw.InningsDetails.Balls == 1 && raw.InningsDetails.Overs > 0 {
+		SS.PrevBowler = SS.CurBowler
+	}
+	SS.CurBowler = raw.PlayersInAction.Bowler
+	// have extra details ...
+
+	// have prev balls and commentry of 12 balls ...
+
+	if len(commentryArray) > 0 {
+
+		for i := len(commentryArray) - 1; i >= Max(0, len(commentryArray)-13); i-- {
+
+		}
+	}
+
+}
+
+func (sm *ScoreManager) generateCommentry_2(raw entities.ScoreItem) entities.CommentryF {
 	// create commentry and send it back to process function ..
 	if raw.WicketDetails.IsWicket {
 		r := entities.Wicket{
