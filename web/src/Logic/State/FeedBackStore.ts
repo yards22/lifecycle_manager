@@ -13,16 +13,25 @@ export class FeedBackStore{
     }
 
     @action
+    SetFeedBack = (x:MFeedBack[])=>{
+        this.feedbackArray = x;
+    }
+
+    @action
     SetIsLoading = (loading : boolean) =>{
         this.isLoading = loading
     }
 
     @action
     GetFeedBacks = async ()=> {
+        this.SetIsLoading(true)
         try{
-
+            let x = await this.feedBackRepo.getFeedBacks();
+            if(x) this.SetFeedBack(x);
         }catch(e){
-
+            throw e;
+        }finally{
+            this.SetIsLoading(false)
         }
     }
 }

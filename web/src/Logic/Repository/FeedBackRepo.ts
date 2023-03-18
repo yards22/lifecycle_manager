@@ -1,3 +1,5 @@
+import { DummyTestDataFeedBack } from "../../Data/DummyFeedBackData";
+import { MFeedBack } from "../Modal/MFeedBack";
 import {Request} from "../Utils/Fetch"
 
 export class FeedBackRepo{
@@ -9,7 +11,11 @@ export class FeedBackRepo{
         this.rq = rq
     }
 
-    async getFeedBacks(){
-        
+    async getFeedBacks():Promise<MFeedBack[]| undefined>{
+        try{
+            return DummyTestDataFeedBack;
+        }catch(e){
+
+        }
     }
 }
