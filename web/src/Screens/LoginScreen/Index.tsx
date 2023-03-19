@@ -38,6 +38,7 @@ function LoginScreenIndex() {
     console.log("mail_ID",res)
     if(res===200){
       stores.authStore.SetIsUserLoggedIn(true)
+      window.location.reload()
     }
   }
 

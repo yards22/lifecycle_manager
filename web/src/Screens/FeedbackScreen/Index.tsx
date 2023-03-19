@@ -1,39 +1,49 @@
-import { Observer } from 'mobx-react-lite'
-import styled from 'styled-components'
-import { DummyTestDataFeedBack } from '../../Data/DummyFeedBackData'
-import { useStores } from '../../Logic/Providers/StateProvider'
-import FeedBackCard from './FeedBackCard'
+import { Observer } from "mobx-react-lite";
+import styled from "styled-components";
+import { useStores } from "../../Logic/Providers/StateProvider";
+import FeedBackCard from "./FeedBackCard";
+import { useEffect } from "react";
 
 const SFeedBackScreenIndex = styled.div`
-   display: grid;
-   grid-template-columns: ${(p)=> p.theme.deviceWidth > 1600 ? "auto auto auto": p.theme.deviceWidth < 800 ? "auto":"auto auto"};
-   width: 100%;
-   flex-wrap: wrap;
-   /* border: 1px solid ; */
-`
+  display: grid;
+  grid-template-columns: ${(p) =>
+    p.theme.deviceWidth > 1600
+      ? "auto auto auto"
+      : p.theme.deviceWidth < 800
+      ? "auto"
+      : "auto auto"};
+  width: 100%;
+  flex-wrap: wrap;
+  /* border: 1px solid ; */
+`;
 
 function FeedBackScreenIndex() {
   const stores = useStores();
+
+  useEffect(() => {
+    stores.feedBackStore.GetFeedBacks();
+  }, []);
+
+  const { feedBackStore, appStore } = stores;
   return (
-    <Observer>
-      {
-        ()=>{
-          const {appStore} = stores
-          return(
-            <SFeedBackScreenIndex theme={{deviceWidth : appStore.deviceWidth}}>
-                {
-                  DummyTestDataFeedBack.map((each)=>{
-                    return(
-                      <FeedBackCard key={"feedbackNo"+each.feedback_id} feedBack={each} />
-                    )
-                  })
-                }
-            </SFeedBackScreenIndex>
-          )
-        }
-      }
-    </Observer>
-  )
+    <SFeedBackScreenIndex theme={{ deviceWidth: appStore.deviceWidth }}>
+      <Observer>
+        {() => {
+          const { feedbackArray } = feedBackStore;
+          if (feedbackArray.length === 0) return <p>No feedback</p>;
+          return (
+            <div>
+              {feedbackArray.map((item, index) => {
+                return (
+                  <FeedBackCard feedBack={item} key={`normal_post_${index}`} />
+                );
+              })}
+            </div>
+          );
+        }}
+      </Observer>
+    </SFeedBackScreenIndex>
+  );
 }
 
-export default FeedBackScreenIndex
+export default FeedBackScreenIndex;

@@ -1,13 +1,15 @@
 import { DummyTestDataFeedBack } from "../../Data/DummyFeedBackData";
 import { MFeedBack } from "../Modal/MFeedBack";
 import {Request} from "../Utils/Fetch"
+import { CheckResponse } from "../Utils/ResponseHandler";
+import { AuthHeaders, AuthHeadersWithoutToken } from "../Utils/AuthHeaders";
 
 export class FeedBackRepo{
     rq : Request;
-    basUrl : string;
-    
+    baseUrl : string;
+
     constructor(baseURL : string,rq:Request){
-        this.basUrl = baseURL
+        this.baseUrl = baseURL
         this.rq = rq
     }
 

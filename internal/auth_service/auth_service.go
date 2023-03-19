@@ -10,6 +10,7 @@ import (
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
 	"github.com/yards22/lcmanager/pkg/app_config"
 	kvstore "github.com/yards22/lcmanager/pkg/kv_store"
+	"github.com/yards22/lcmanager/pkg/mailer"
 	util "github.com/yards22/lcmanager/util"
 )
 
@@ -47,10 +48,11 @@ type RegisterRoleArgs struct {
 type AuthService struct {
 	kv      *kvstore.RedisKVStore
 	querier sqlc.Querier
+	mailer  *mailer.GoMail
 }
 
-func New(kv *kvstore.RedisKVStore, querier sqlc.Querier) *AuthService {
-	return &AuthService{kv, querier}
+func New(kv *kvstore.RedisKVStore, querier sqlc.Querier, mailer *mailer.GoMail) *AuthService {
+	return &AuthService{kv, querier, mailer}
 }
 
 func (as *AuthService) PerformMailIdCheck(ctx context.Context, arg SendOTPArgs) string {
@@ -62,6 +64,10 @@ func (as *AuthService) PerformMailIdCheck(ctx context.Context, arg SendOTPArgs) 
 		otp := util.GenerateRandom(6)
 		err := as.kv.Set("admin_otp_"+otp, arg.MailId)
 		fmt.Println(err)
+		err = as.mailer.Send("22Yardz Admin", arg.MailId, "OTP Verification", fmt.Sprintf("Your OTP is %s.", otp))
+		if err != nil {
+			fmt.Println(err)
+		}
 		return otp
 	}
 	return uuid.Nil.String()
@@ -86,7 +92,7 @@ func (as *AuthService) PerformLogin(ctx context.Context, arg LoginArgs) string {
 		for as.kv.Get(token) == "Nil" {
 			token = util.GenerateRandomToken(64)
 		}
-		x := arg.MailId + "/" + categories
+		x := arg.MailId + " " + categories
 		as.kv.Set("admin_"+token, x)
 		return token
 	}
@@ -114,6 +120,7 @@ func (as *AuthService) PerformLogout(ctx context.Context, token string) {
 
 func (as *AuthService) CheckSession(ctx context.Context, token string) []string {
 	data := as.kv.Get("admin_" + token)
+	fmt.Println("checkSession data ", data)
 	if data != uuid.Nil.String() {
 		open_to := strings.Split(data, " ")[2]
 		categories := strings.Split(open_to, "/")

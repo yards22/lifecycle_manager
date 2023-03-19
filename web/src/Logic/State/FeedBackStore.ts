@@ -3,13 +3,15 @@ import { MFeedBack } from "../Modal/MFeedBack";
 import { FeedBackRepo } from "../Repository/FeedBackRepo";
 
 export class FeedBackStore{
-    @observable isLoading : boolean = false
-    @observable feedbackArray : MFeedBack[] = []
+    @observable isLoading : boolean = false;
+    @observable feedbackArray : MFeedBack[] = [];
+    @observable token:string|null =null
     feedBackRepo : FeedBackRepo
 
     constructor(feedBackRepo:FeedBackRepo){
         makeAutoObservable(this)
         this.feedBackRepo = feedBackRepo
+        this.token = window.localStorage.getItem("token");
     }
 
     @action
@@ -34,4 +36,4 @@ export class FeedBackStore{
             this.SetIsLoading(false)
         }
     }
-}
+   }

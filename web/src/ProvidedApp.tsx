@@ -20,7 +20,9 @@ interface ProvidedAppProps {
     children?: React.ReactNode;
   }
 
-const BASE_URL = "http://localhost:3001"
+const BASE_URL = "http://localhost:5000";
+const BASE_URL_FOR_IMAGES =
+  "https://22yards-image-bucket.s3.ap-south-1.amazonaws.com/";
 
 function ProvidedApp(props:ProvidedAppProps) {
   const rq = new Request({});

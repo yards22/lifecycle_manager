@@ -34,7 +34,7 @@ func (tpm *TPManager) GenerateTrendingPosts(ctx context.Context) {
 	// Get Likes-Posts array.
 	// These are all the likes that got generated during last week.
 
-	likes, err := tpm.querier.LikeTrending(ctx)
+	likes, err := tpm.querier.LikeTrending(ctx, app_config.Data.MustInt("duration_trending_post"))
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -44,7 +44,7 @@ func (tpm *TPManager) GenerateTrendingPosts(ctx context.Context) {
 	// Get Comment-Posts array.
 	// These are all the likes that got generated during last week.
 
-	comments, err := tpm.querier.CommentTrending(ctx)
+	comments, err := tpm.querier.CommentTrending(ctx, app_config.Data.MustInt("duration_trending_post"))
 	if err != nil {
 		fmt.Println(err.Error())
 	}

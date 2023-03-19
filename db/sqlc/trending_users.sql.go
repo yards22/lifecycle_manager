@@ -11,7 +11,7 @@ import (
 
 const commentTrendingUsers = `-- name: CommentTrendingUsers :many
 SELECT user_id,COUNT(post_id) as comment_count from parent_comments 
-WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 DAY) 
+WHERE created_at >= DATE_SUB(NOW(),INTERVAL ? MINUTE) 
 GROUP BY user_id
 `
 
@@ -20,8 +20,8 @@ type CommentTrendingUsersRow struct {
 	CommentCount int64 `json:"comment_count"`
 }
 
-func (q *Queries) CommentTrendingUsers(ctx context.Context) ([]*CommentTrendingUsersRow, error) {
-	rows, err := q.query(ctx, q.commentTrendingUsersStmt, commentTrendingUsers)
+func (q *Queries) CommentTrendingUsers(ctx context.Context, dateSUB interface{}) ([]*CommentTrendingUsersRow, error) {
+	rows, err := q.query(ctx, q.commentTrendingUsersStmt, commentTrendingUsers, dateSUB)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (q *Queries) CommentTrendingUsers(ctx context.Context) ([]*CommentTrendingU
 
 const deleteTrendingUsers = `-- name: DeleteTrendingUsers :exec
 DELETE from trending_users
-where created_at < DATE_SUB(NOW(),INTERVAL ? DAY)
+where created_at < DATE_SUB(NOW(),INTERVAL ? MINUTE)
 `
 
 func (q *Queries) DeleteTrendingUsers(ctx context.Context, dateSUB interface{}) error {
@@ -65,7 +65,7 @@ func (q *Queries) InsertTrendingUsers(ctx context.Context, userID int32) error {
 const likeTrendingUsers = `-- name: LikeTrendingUsers :many
 SELECT posts.user_id,COUNT(likes.post_id) as like_count from likes
 INNER JOIN posts ON posts.post_id = likes.post_id
-WHERE likes.created_at >= DATE_SUB(NOW(),INTERVAL 1 DAY) 
+WHERE likes.created_at >= DATE_SUB(NOW(),INTERVAL ? MINUTE) 
 GROUP BY posts.user_id
 `
 
@@ -74,8 +74,8 @@ type LikeTrendingUsersRow struct {
 	LikeCount int64 `json:"like_count"`
 }
 
-func (q *Queries) LikeTrendingUsers(ctx context.Context) ([]*LikeTrendingUsersRow, error) {
-	rows, err := q.query(ctx, q.likeTrendingUsersStmt, likeTrendingUsers)
+func (q *Queries) LikeTrendingUsers(ctx context.Context, dateSUB interface{}) ([]*LikeTrendingUsersRow, error) {
+	rows, err := q.query(ctx, q.likeTrendingUsersStmt, likeTrendingUsers, dateSUB)
 	if err != nil {
 		return nil, err
 	}

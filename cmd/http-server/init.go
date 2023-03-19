@@ -2,12 +2,18 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
 	cors "github.com/rs/cors"
+	"github.com/streadway/amqp"
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
 	authservice "github.com/yards22/lcmanager/internal/auth_service"
 	"github.com/yards22/lcmanager/internal/feedback_manager"
@@ -15,11 +21,13 @@ import (
 	"github.com/yards22/lcmanager/internal/r_manager"
 	"github.com/yards22/lcmanager/internal/r_posts_manager"
 	"github.com/yards22/lcmanager/internal/r_users_manager"
+	scoremanager "github.com/yards22/lcmanager/internal/score_manager"
 	"github.com/yards22/lcmanager/internal/t_posts_manager"
 	"github.com/yards22/lcmanager/internal/t_users_manager"
 	"github.com/yards22/lcmanager/internal/token_manager"
 	"github.com/yards22/lcmanager/pkg/app_config"
 	kvstore "github.com/yards22/lcmanager/pkg/kv_store"
+	"github.com/yards22/lcmanager/pkg/mailer"
 	objectstore "github.com/yards22/lcmanager/pkg/object_store"
 )
 
@@ -42,40 +50,67 @@ func initDB(app *App) {
 
 }
 
+func initKVDB(app *App) {
+	sess := session.Must(session.NewSession())
+	db := dynamodb.New(sess, &aws.Config{
+		Region:      aws.String(app_config.Data.MustString("Dynamo_Region")),
+		Credentials: credentials.NewStaticCredentials("AKIAUZAIJPCMOYOR7ZEN", "HU9drLbe1E90lORcPlfDIsPlaxngAFuh+M3QbCqF", ""),
+	})
+	app.kvdb = db
+	app.logger.Println("connected to kvDB")
+}
+
 func initRunnerManagers(app *App) {
 	// Initialize managers and add to app
 
 	querier := sqlc.New(app.db)
 
 	// token manager runner
-	d := time.Duration(app_config.Data.MustInt("duration_token") * int(time.Hour))
+	d := time.Duration(app_config.Data.MustInt("duration_token") * int(time.Minute))
 	tokenManager := token_manager.New(querier, d)
 	app.managers["tokenManager"] = tokenManager
 
 	// trending post runner
-	d = time.Duration(app_config.Data.MustInt("duration_trending_post") * int(time.Hour))
+	d = time.Duration(app_config.Data.MustInt("duration_trending_post") * int(time.Minute))
 	trendingPostsManager := t_posts_manager.New(querier, d)
 	app.managers["trendingPostsManager"] = trendingPostsManager
 
 	// trending user runner
-	d = time.Duration(app_config.Data.MustInt("duration_trending_user") * int(time.Hour))
+	d = time.Duration(app_config.Data.MustInt("duration_trending_user") * int(time.Minute))
 	trendingUserManager := t_users_manager.New(querier, d)
 	app.managers["trendingUserManager"] = trendingUserManager
 
 	// recommended user runner
-	d = time.Duration(app_config.Data.MustInt("duration_recommended_user") * int(time.Hour))
+	d = time.Duration(app_config.Data.MustInt("duration_recommended_user") * int(time.Minute))
 	recommendedUsersManager := r_users_manager.New(querier, d)
 	app.managers["recommendedUsersManager"] = recommendedUsersManager
 
 	// recommended post runner
-	d = time.Duration(app_config.Data.MustInt("duration_recommended_post") * int(time.Hour))
+	d = time.Duration(app_config.Data.MustInt("duration_recommended_post") * int(time.Minute))
 	recommendedPostsManager := r_posts_manager.New(querier, d)
 	app.managers["recommendedPostsManager"] = recommendedPostsManager
 
 	// rating runner
-	d = time.Duration(app_config.Data.MustInt("duration_rating") * int(time.Hour))
+	d = time.Duration(app_config.Data.MustInt("duration_rating") * int(time.Minute))
 	ratingManager := r_manager.New(querier, d)
 	app.managers["ratingManager"] = ratingManager
+}
+
+func initConsumer(app *App) {
+	conn, err := amqp.Dial("amqps://qwiynkfq:pEcA9NfiesS0wIbNrGewvVjIrqMmO4v4@puffin.rmq2.cloudamqp.com/qwiynkfq")
+	if err != nil {
+		fmt.Println("Failed Initializing Broker Connection")
+		panic(err)
+	}
+	fmt.Println("Initializing Broker Connection")
+	ch, err := conn.Channel()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	scoreManager := scoremanager.New(app.kvdb, ch)
+	app.managers["score_manager"] = scoreManager
+
 }
 
 func initManagers(app *App) {
@@ -90,9 +125,12 @@ func initServer(app *App) {
 	r := chi.NewRouter()
 
 	reactUri := app_config.Data.MustString("REACT_URI")
+
 	r.Use(cors.New(cors.Options{
 		AllowedOrigins:   []string{reactUri},
 		AllowCredentials: true,
+		AllowedHeaders:   []string{"Accept", "Content-Type", "Content-Length", "Accept-Encoding", "Authorization", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Authorization"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
 	}).Handler)
 
@@ -105,7 +143,8 @@ func initServer(app *App) {
 }
 
 func initAuthService(app *App) {
-	app.authService = authservice.New(kvstore.New(), sqlc.New(app.db))
+	//  	mailer, err := mailer.NewGoMail("smtpout.secureserver.net", 587, "contact@22yardz.in", "JEvrW59syf5v9tc", true)
+	app.authService = authservice.New(kvstore.New(), sqlc.New(app.db), app.mailer)
 }
 
 func initObjectStore(app *App) {
@@ -118,4 +157,12 @@ func initObjectStore(app *App) {
 		panic(err)
 	}
 	app.objectStore = objectStore
+}
+
+func initMailer(app *App) {
+	mailer, err := mailer.NewGoMail(app_config.Data.MustString("MAIL_HOST"), app_config.Data.MustInt("MAIL_PORT"), app_config.Data.MustString("MAIL_ID"), app_config.Data.MustString("MAIL_PASSWORD"), true)
+	if err != nil {
+		fmt.Println(err)
+	}
+	app.mailer = mailer
 }

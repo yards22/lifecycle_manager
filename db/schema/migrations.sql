@@ -278,3 +278,12 @@ ALTER TABLE `polls_reaction` ADD CONSTRAINT `polls_reaction_poll_id_fkey` FOREIG
 
 -- AddForeignKey
 ALTER TABLE `polls_reaction` ADD CONSTRAINT `polls_reaction_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AlterTable
+ALTER TABLE `feedback` ADD COLUMN `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
+
+-- AlterTable
+ALTER TABLE `feedback` ADD COLUMN `status` BOOLEAN NOT NULL DEFAULT false;
+
+-- AlterTable
+ALTER TABLE `feedback` ADD COLUMN `comment` VARCHAR(191) NULL;

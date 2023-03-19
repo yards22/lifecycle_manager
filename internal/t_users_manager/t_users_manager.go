@@ -33,7 +33,7 @@ func (tpm *TUManager) GenerateTrendingUsers(ctx context.Context) {
 	// Get Likes-Posts array.
 	// These are all the likes that got generated during last day.
 
-	likes, err := tpm.querier.LikeTrendingUsers(ctx)
+	likes, err := tpm.querier.LikeTrendingUsers(ctx, app_config.Data.MustInt("duration_recommended_user"))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -41,7 +41,7 @@ func (tpm *TUManager) GenerateTrendingUsers(ctx context.Context) {
 	// Get Comment-Posts array.
 	// These are all the likes that got generated during last day.
 
-	comments, err := tpm.querier.CommentTrendingUsers(ctx)
+	comments, err := tpm.querier.CommentTrendingUsers(ctx, app_config.Data.MustInt("duration_recommended_user"))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -80,7 +80,7 @@ func (tpm *TUManager) GenerateTrendingUsers(ctx context.Context) {
 
 	// delete the trending posts except last few weeks
 
-	tpm.querier.DeleteTrendingUsers(ctx, app_config.Data.MustInt("trending_posts_lifetime"))
+	tpm.querier.DeleteTrendingUsers(ctx, app_config.Data.MustInt("trending_users_lifetime"))
 
 	// Insert these posts into Trending Table.
 	for _, j := range topPicks {
