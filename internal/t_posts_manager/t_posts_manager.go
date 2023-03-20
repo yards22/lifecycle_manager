@@ -3,10 +3,12 @@ package t_posts_manager
 import (
 	"context"
 	"fmt"
+	"log"
 	"sort"
 	"time"
 
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
+	"github.com/yards22/lcmanager/pkg/app_config"
 	"github.com/yards22/lcmanager/pkg/runner"
 )
 
@@ -22,6 +24,7 @@ type Tentries struct {
 }
 
 func New(querier sqlc.Querier, interval time.Duration) *TPManager {
+	log.Println("setup trending post runner at interval", interval.Minutes())
 	return &TPManager{querier, runner.New(interval)}
 }
 
@@ -31,7 +34,7 @@ func (tpm *TPManager) GenerateTrendingPosts(ctx context.Context) {
 	// Get Likes-Posts array.
 	// These are all the likes that got generated during last week.
 
-	likes, err := tpm.querier.LikeTrending(ctx)
+	likes, err := tpm.querier.LikeTrending(ctx, app_config.Data.MustInt("duration_trending_post"))
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -41,7 +44,7 @@ func (tpm *TPManager) GenerateTrendingPosts(ctx context.Context) {
 	// Get Comment-Posts array.
 	// These are all the likes that got generated during last week.
 
-	comments, err := tpm.querier.CommentTrending(ctx)
+	comments, err := tpm.querier.CommentTrending(ctx, app_config.Data.MustInt("duration_trending_post"))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -77,6 +80,11 @@ func (tpm *TPManager) GenerateTrendingPosts(ctx context.Context) {
 		topPicks = append(topPicks, Tentries{k, CAI[k], true})
 	}
 
+	fmt.Println(topPicks)
+	// delete the trending posts except last few weeks
+
+	tpm.querier.DeleteTrendingPosts(ctx, app_config.Data.MustInt("trending_posts_lifetime"))
+
 	// Insert these posts into Trending Table.
 	for _, j := range topPicks {
 		tpm.querier.InsertTrending(ctx, j.id)
@@ -86,6 +94,7 @@ func (tpm *TPManager) GenerateTrendingPosts(ctx context.Context) {
 
 func (tm *TPManager) Run() {
 	tm.runner.Run(func() {
+		log.Println("invoking trending post fn")
 		tm.GenerateTrendingPosts(context.Background())
 	})
 

@@ -3,10 +3,12 @@ package t_users_manager
 import (
 	"context"
 	"fmt"
+	"log"
 	"sort"
 	"time"
 
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
+	"github.com/yards22/lcmanager/pkg/app_config"
 	"github.com/yards22/lcmanager/pkg/runner"
 )
 
@@ -21,6 +23,7 @@ type Tentries struct {
 }
 
 func New(querier sqlc.Querier, interval time.Duration) *TUManager {
+	log.Println("setup trending user runner at interval", interval.Minutes())
 	return &TUManager{querier, runner.New(interval)}
 }
 
@@ -30,7 +33,7 @@ func (tpm *TUManager) GenerateTrendingUsers(ctx context.Context) {
 	// Get Likes-Posts array.
 	// These are all the likes that got generated during last day.
 
-	likes, err := tpm.querier.LikeTrendingUsers(ctx)
+	likes, err := tpm.querier.LikeTrendingUsers(ctx, app_config.Data.MustInt("duration_recommended_user"))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -38,7 +41,7 @@ func (tpm *TUManager) GenerateTrendingUsers(ctx context.Context) {
 	// Get Comment-Posts array.
 	// These are all the likes that got generated during last day.
 
-	comments, err := tpm.querier.CommentTrendingUsers(ctx)
+	comments, err := tpm.querier.CommentTrendingUsers(ctx, app_config.Data.MustInt("duration_recommended_user"))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -75,7 +78,9 @@ func (tpm *TUManager) GenerateTrendingUsers(ctx context.Context) {
 		topPicks = append(topPicks, Tentries{k, CAI[k]})
 	}
 
-	fmt.Println(topPicks)
+	// delete the trending posts except last few weeks
+
+	tpm.querier.DeleteTrendingUsers(ctx, app_config.Data.MustInt("trending_users_lifetime"))
 
 	// Insert these posts into Trending Table.
 	for _, j := range topPicks {
@@ -86,6 +91,7 @@ func (tpm *TUManager) GenerateTrendingUsers(ctx context.Context) {
 
 func (tm *TUManager) Run() {
 	tm.runner.Run(func() {
+		log.Println("invoking trending user runner fn")
 		tm.GenerateTrendingUsers(context.Background())
 	})
 

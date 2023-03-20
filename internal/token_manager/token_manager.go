@@ -3,6 +3,7 @@ package token_manager
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
@@ -15,6 +16,7 @@ type TokenManager struct {
 }
 
 func New(querier sqlc.Querier, interval time.Duration) *TokenManager {
+	log.Println("setup token runner at interval", interval.Minutes())
 	return &TokenManager{querier, runner.New(interval)}
 }
 
@@ -28,6 +30,7 @@ func (tm *TokenManager) CleanExpiredTokens(ctx context.Context) {
 
 func (tm *TokenManager) Run() {
 	tm.runner.Run(func() {
+		log.Println("invoking token runner fn")
 		tm.CleanExpiredTokens(context.Background())
 	})
 }

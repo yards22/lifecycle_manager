@@ -32,7 +32,7 @@ func (q *Queries) CreateStories(ctx context.Context, arg CreateStoriesParams) er
 }
 
 const getStories = `-- name: GetStories :many
-SELECT story_id, user_id, title, content, media, created_at FROM stories
+SELECT story_id, mail_id, content, media, created_at FROM stories
 `
 
 func (q *Queries) GetStories(ctx context.Context) ([]*Story, error) {
@@ -46,8 +46,7 @@ func (q *Queries) GetStories(ctx context.Context) ([]*Story, error) {
 		var i Story
 		if err := rows.Scan(
 			&i.StoryID,
-			&i.UserID,
-			&i.Title,
+			&i.MailID,
 			&i.Content,
 			&i.Media,
 			&i.CreatedAt,

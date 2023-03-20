@@ -12,8 +12,18 @@ export class AuthRepo{
 
     async sendAuthOTP(mail_id : string){
         try{
-            const res = await this.rq.Post(this.baseUrl+"/sendOTP",mail_id,AuthHeadersWithoutToken())
-            console.log(res)
+            const res = await this.rq.Post(this.baseUrl+"/sendOTP",{mail_id},AuthHeadersWithoutToken())
+            return res.status
+        }catch(e){
+            console.log(e)
+        }
+    }
+
+    async verifyAuthOTP(mail_id:string, OTP : string){
+        try{
+            const res = await this.rq.Post(this.baseUrl+"/login",{mail_id,OTP},AuthHeadersWithoutToken())
+            const response = await res.json()
+            return response
         }catch(e){
             console.log(e)
         }

@@ -3,10 +3,12 @@ package r_manager
 import (
 	"context"
 	"fmt"
+	"log"
 	"math"
 	"time"
 
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
+	"github.com/yards22/lcmanager/pkg/app_config"
 	"github.com/yards22/lcmanager/pkg/runner"
 )
 
@@ -23,6 +25,7 @@ type RatingManager struct {
 }
 
 func New(querier sqlc.Querier, interval time.Duration) *RatingManager {
+	log.Println("setup rating runner at interval", interval.Minutes())
 	return &RatingManager{querier, runner.New(interval)}
 }
 
@@ -52,9 +55,11 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 		fmt.Println(err)
 	}
 
+	duration_ := app_config.Data.MustInt("duration_rating")
+
 	// score changes because of Posts...
 
-	posts, err := rm.querier.GetPosts(ctx)
+	posts, err := rm.querier.GetPosts(ctx, duration_)
 
 	if err != nil {
 		fmt.Println(err)
@@ -69,7 +74,7 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 
 	// // score changes because of followers & following .
 
-	followers, err := rm.querier.GetFollwers(ctx)
+	followers, err := rm.querier.GetFollwers(ctx, duration_)
 
 	if err != nil {
 		fmt.Println(err)
@@ -82,7 +87,7 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 		score[int(followers[follower].UserID)] += res_followers * p / i_s
 	}
 
-	following, err := rm.querier.GetFollowing(ctx)
+	following, err := rm.querier.GetFollowing(ctx, duration_)
 
 	if err != nil {
 		fmt.Println(err)
@@ -100,13 +105,13 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 	p := proportions.reactions
 	i_s := idealScores.reactions
 
-	likes, err := rm.querier.GetUserLikes(ctx)
+	likes, err := rm.querier.GetUserLikes(ctx, duration_)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	comments, err := rm.querier.GetUserComments(ctx)
+	comments, err := rm.querier.GetUserComments(ctx, duration_)
 
 	if err != nil {
 		fmt.Println(err)
@@ -122,8 +127,6 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 	for comment_ := 0; comment_ < len(comments); comment_++ {
 		reactions[int(comments[comment_].UserID)] += float64(comments[comment_].CommentCount)
 	}
-
-	fmt.Println("reaction", reactions[1])
 
 	// get followers count
 
@@ -154,7 +157,11 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 			println(err)
 		}
 
-		updated_index := get_rating + int32(rm.RatingFunction(score[user], (get_rating/200)*5))
+		updated_index := get_rating + int32(rm.RatingFunction(score[user], (get_rating/200)))
+
+		log.Println("rating_uses_id_", user, " prev ", get_rating, " updated ", updated_index)
+		log.Println("rating_user_id_", user, " score ", score[user])
+		log.Println("rating_user_id_", user, " slab ", get_rating/200)
 
 		rm.querier.UpdateRating(ctx, sqlc.UpdateRatingParams{
 			CricIndex: updated_index,
@@ -166,16 +173,20 @@ func (rm *RatingManager) UpdateRatings(ctx context.Context) {
 
 func (rm *RatingManager) RatingFunction(score float64, present_slab int32) float64 {
 
-	threshold := [9]float64{0, 5, 10, 15, 20, 25, 30, 35, 40}
+	threshold := [10]float64{0, 5, 10, 15, 20, 25, 30, 35, 40, 45}
 
-	denom := math.Log2(float64(present_slab + 1))
+	denom := math.Log2(float64(present_slab + 2))
+	if present_slab > 9 {
+		num := score - threshold[9]
+		return num / denom
+	}
 	num := score - threshold[present_slab]
-
 	return num / denom
 }
 
 func (rm *RatingManager) Run() {
 	rm.runner.Run(func() {
+		log.Println("invoking rating runner fn")
 		rm.UpdateRatings(context.Background())
 	})
 }

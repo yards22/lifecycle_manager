@@ -38,7 +38,7 @@ func (q *Queries) GetFollowersCount(ctx context.Context) ([]int32, error) {
 
 const getFollowing = `-- name: GetFollowing :many
 SELECT follower_id as user_id,count(following_id) from networks
-WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 DAY) 
+WHERE created_at >= DATE_SUB(NOW(),INTERVAL (?) MINUTE) 
 group BY follower_id
 `
 
@@ -47,8 +47,8 @@ type GetFollowingRow struct {
 	Count  int64 `json:"count"`
 }
 
-func (q *Queries) GetFollowing(ctx context.Context) ([]*GetFollowingRow, error) {
-	rows, err := q.query(ctx, q.getFollowingStmt, getFollowing)
+func (q *Queries) GetFollowing(ctx context.Context, dateSUB interface{}) ([]*GetFollowingRow, error) {
+	rows, err := q.query(ctx, q.getFollowingStmt, getFollowing, dateSUB)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (q *Queries) GetFollowing(ctx context.Context) ([]*GetFollowingRow, error) 
 
 const getFollwers = `-- name: GetFollwers :many
 SELECT following_id as user_id,count(follower_id) from networks
-WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 DAY) 
+WHERE created_at >= DATE_SUB(NOW(),INTERVAL (?) MINUTE) 
 group by following_id
 `
 
@@ -81,8 +81,8 @@ type GetFollwersRow struct {
 	Count  int64 `json:"count"`
 }
 
-func (q *Queries) GetFollwers(ctx context.Context) ([]*GetFollwersRow, error) {
-	rows, err := q.query(ctx, q.getFollwersStmt, getFollwers)
+func (q *Queries) GetFollwers(ctx context.Context, dateSUB interface{}) ([]*GetFollwersRow, error) {
+	rows, err := q.query(ctx, q.getFollwersStmt, getFollwers, dateSUB)
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +106,7 @@ func (q *Queries) GetFollwers(ctx context.Context) ([]*GetFollwersRow, error) {
 
 const getPosts = `-- name: GetPosts :many
 SELECT user_id,count(post_id) from posts
+WHERE created_at >= DATE_SUB(NOW(),INTERVAL (?) MINUTE) 
 group by user_id
 `
 
@@ -114,8 +115,8 @@ type GetPostsRow struct {
 	Count  int64 `json:"count"`
 }
 
-func (q *Queries) GetPosts(ctx context.Context) ([]*GetPostsRow, error) {
-	rows, err := q.query(ctx, q.getPostsStmt, getPosts)
+func (q *Queries) GetPosts(ctx context.Context, dateSUB interface{}) ([]*GetPostsRow, error) {
+	rows, err := q.query(ctx, q.getPostsStmt, getPosts, dateSUB)
 	if err != nil {
 		return nil, err
 	}
@@ -152,6 +153,7 @@ func (q *Queries) GetRating(ctx context.Context, userID int32) (int32, error) {
 const getUserComments = `-- name: GetUserComments :many
 SELECT posts.user_id, count(parent_comments.post_id) as comment_count from parent_comments
 join posts on posts.post_id = parent_comments.post_id
+WHERE created_at  >= DATE_SUB(NOW(),INTERVAL (?) MINUTE)
 group by posts.user_id
 `
 
@@ -160,8 +162,8 @@ type GetUserCommentsRow struct {
 	CommentCount int64 `json:"comment_count"`
 }
 
-func (q *Queries) GetUserComments(ctx context.Context) ([]*GetUserCommentsRow, error) {
-	rows, err := q.query(ctx, q.getUserCommentsStmt, getUserComments)
+func (q *Queries) GetUserComments(ctx context.Context, dateSUB interface{}) ([]*GetUserCommentsRow, error) {
+	rows, err := q.query(ctx, q.getUserCommentsStmt, getUserComments, dateSUB)
 	if err != nil {
 		return nil, err
 	}
@@ -186,6 +188,7 @@ func (q *Queries) GetUserComments(ctx context.Context) ([]*GetUserCommentsRow, e
 const getUserLikes = `-- name: GetUserLikes :many
 SELECT posts.user_id, count(likes.post_id) as like_count from likes
 join posts on posts.post_id = likes.post_id
+WHERE created_at  >= DATE_SUB(NOW(),INTERVAL (?) MINUTE)
 group by posts.user_id
 `
 
@@ -194,8 +197,8 @@ type GetUserLikesRow struct {
 	LikeCount int64 `json:"like_count"`
 }
 
-func (q *Queries) GetUserLikes(ctx context.Context) ([]*GetUserLikesRow, error) {
-	rows, err := q.query(ctx, q.getUserLikesStmt, getUserLikes)
+func (q *Queries) GetUserLikes(ctx context.Context, dateSUB interface{}) ([]*GetUserLikesRow, error) {
+	rows, err := q.query(ctx, q.getUserLikesStmt, getUserLikes, dateSUB)
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,11 @@
+{
+    "duration_token": 1440,
+    "duration_trending_user": 30,
+    "duration_trending_post": 30,
+    "duration_recommended_user": 45,
+    "duration_recommended_post": 45,
+    "duration_rating": 360,
+    "trending_posts_lifetime":300,
+    "trending_users_lifetime":300
+
+}   

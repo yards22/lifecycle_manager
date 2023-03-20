@@ -3,12 +3,13 @@ package r_users_manager
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
-	"strings"
 	"time"
 
 	sqlc "github.com/yards22/lcmanager/db/sqlc"
 	"github.com/yards22/lcmanager/pkg/runner"
+	"github.com/yards22/lcmanager/util"
 )
 
 type RUManager struct {
@@ -22,6 +23,7 @@ type UpsertRecommendationsParams struct {
 }
 
 func New(querier sqlc.Querier, interval time.Duration) *RUManager {
+	log.Println("setup recommended user runner at interval", interval.Minutes())
 	return &RUManager{querier, runner.New(interval)}
 }
 
@@ -62,10 +64,12 @@ func (rum *RUManager) GenerateRecommendedUsers(ctx context.Context) {
 
 		for mutual := 0; mutual < len(uniqueIds); mutual++ {
 			m_id := strconv.Itoa(int(uniqueIds[mutual]))
-			stringified_mutual_id = append(stringified_mutual_id, m_id)
+			if uniqueIds[mutual] != int32(user) {
+				stringified_mutual_id = append(stringified_mutual_id, m_id)
+			}
 		}
 
-		res := strings.Join(stringified_mutual_id, "-")
+		res := util.Stringify(stringified_mutual_id)
 
 		fmt.Println(res)
 
@@ -81,6 +85,7 @@ func (rum *RUManager) GenerateRecommendedUsers(ctx context.Context) {
 
 func (rum *RUManager) Run() {
 	rum.runner.Run(func() {
+		log.Println("invoking recommended user runner fn")
 		rum.GenerateRecommendedUsers(context.Background())
 	})
 

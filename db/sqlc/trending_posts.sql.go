@@ -11,7 +11,7 @@ import (
 
 const commentTrending = `-- name: CommentTrending :many
 SELECT post_id,COUNT(user_id) as comment_count from parent_comments 
-WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 DAY) 
+WHERE created_at >= DATE_SUB(NOW(),INTERVAL ? MINUTE) 
 GROUP BY post_id
 `
 
@@ -20,8 +20,8 @@ type CommentTrendingRow struct {
 	CommentCount int64 `json:"comment_count"`
 }
 
-func (q *Queries) CommentTrending(ctx context.Context) ([]*CommentTrendingRow, error) {
-	rows, err := q.query(ctx, q.commentTrendingStmt, commentTrending)
+func (q *Queries) CommentTrending(ctx context.Context, dateSUB interface{}) ([]*CommentTrendingRow, error) {
+	rows, err := q.query(ctx, q.commentTrendingStmt, commentTrending, dateSUB)
 	if err != nil {
 		return nil, err
 	}
@@ -43,6 +43,16 @@ func (q *Queries) CommentTrending(ctx context.Context) ([]*CommentTrendingRow, e
 	return items, nil
 }
 
+const deleteTrendingPosts = `-- name: DeleteTrendingPosts :exec
+DELETE from trending_posts 
+where created_at < DATE_SUB(NOW(),INTERVAL ? MINUTE)
+`
+
+func (q *Queries) DeleteTrendingPosts(ctx context.Context, dateSUB interface{}) error {
+	_, err := q.exec(ctx, q.deleteTrendingPostsStmt, deleteTrendingPosts, dateSUB)
+	return err
+}
+
 const insertTrending = `-- name: InsertTrending :exec
 INSERT INTO trending_posts (post_id) VALUES (?)
 `
@@ -54,7 +64,7 @@ func (q *Queries) InsertTrending(ctx context.Context, postID int64) error {
 
 const likeTrending = `-- name: LikeTrending :many
 SELECT post_id,COUNT(user_id) as like_count from likes
-WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 DAY) 
+WHERE created_at >= DATE_SUB(NOW(),INTERVAL ? MINUTE) 
 GROUP BY post_id
 `
 
@@ -63,8 +73,8 @@ type LikeTrendingRow struct {
 	LikeCount int64 `json:"like_count"`
 }
 
-func (q *Queries) LikeTrending(ctx context.Context) ([]*LikeTrendingRow, error) {
-	rows, err := q.query(ctx, q.likeTrendingStmt, likeTrending)
+func (q *Queries) LikeTrending(ctx context.Context, dateSUB interface{}) ([]*LikeTrendingRow, error) {
+	rows, err := q.query(ctx, q.likeTrendingStmt, likeTrending, dateSUB)
 	if err != nil {
 		return nil, err
 	}

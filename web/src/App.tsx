@@ -6,7 +6,7 @@ import FeedBackScreenIndex from "./Screens/FeedbackScreen/Index";
 import PollsScreenIndex from "./Screens/PollsScreen/Index";
 import StoriesScreenIndex from "./Screens/StoriesScreen/Index";
 import styled from "styled-components"
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import TopBar from "./Organs/Navbar/TopBar/TopBar";
 import BottomBar from "./Organs/Navbar/BottomBar";
 import LoginScreenIndex from "./Screens/LoginScreen/Index";
@@ -29,6 +29,7 @@ const SApp = styled.section`
   }
 `;
 
+const TOKEN_KEY = "token";
 
 function App() {
   const [opened, setOpened] = useState(false);
@@ -39,6 +40,12 @@ function App() {
   useEffect(()=>{
     handleScreenSizeChange();
     window.addEventListener('resize',handleScreenSizeChange)
+    const x = window.localStorage.getItem(TOKEN_KEY)
+    if(x){
+      store.authStore.SetIsUserLoggedIn(true)
+    }else{
+      store.authStore.SetIsUserLoggedIn(false)
+    }
   },[])
 
   const handleScreenSizeChange = ()=>{
@@ -65,10 +72,15 @@ function App() {
               { authStore.isUserLoggedIn && <TopBar/>}
               <SApp>
                  <Routes>
-                   <Route path="/" element={<LoginScreenIndex/>} />
-                   <Route path="/feedback" element={<FeedBackScreenIndex/>}/>
-                   <Route path="/polls" element={<PollsScreenIndex/>}/>
-                   <Route path="/stories" element={<StoriesScreenIndex/>}/>
+                    { !authStore.isUserLoggedIn && <Route path="/" element={<LoginScreenIndex/>} />}
+                    {  authStore.isUserLoggedIn &&
+                      <>
+                        <Route path="/feedback" element={<FeedBackScreenIndex/>}/>
+                        <Route path="/polls" element={<PollsScreenIndex/>}/>
+                        <Route path="/stories" element={<StoriesScreenIndex/>}/>
+                        <Route path="*" element={<Navigate to={"/feedback"}/>} />
+                      </>
+                    }
                  </Routes>
               </SApp>
             </Router>

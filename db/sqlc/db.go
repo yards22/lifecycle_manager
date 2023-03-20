@@ -39,6 +39,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteExpiredTokensStmt, err = db.PrepareContext(ctx, deleteExpiredTokens); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteExpiredTokens: %w", err)
 	}
+	if q.deleteTrendingPostsStmt, err = db.PrepareContext(ctx, deleteTrendingPosts); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteTrendingPosts: %w", err)
+	}
+	if q.deleteTrendingUsersStmt, err = db.PrepareContext(ctx, deleteTrendingUsers); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteTrendingUsers: %w", err)
+	}
 	if q.getAdminStmt, err = db.PrepareContext(ctx, getAdmin); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAdmin: %w", err)
 	}
@@ -99,6 +105,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.likeTrendingUsersStmt, err = db.PrepareContext(ctx, likeTrendingUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query LikeTrendingUsers: %w", err)
 	}
+	if q.updateCommentsStmt, err = db.PrepareContext(ctx, updateComments); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateComments: %w", err)
+	}
 	if q.updateRatingStmt, err = db.PrepareContext(ctx, updateRating); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateRating: %w", err)
 	}
@@ -136,6 +145,16 @@ func (q *Queries) Close() error {
 	if q.deleteExpiredTokensStmt != nil {
 		if cerr := q.deleteExpiredTokensStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteExpiredTokensStmt: %w", cerr)
+		}
+	}
+	if q.deleteTrendingPostsStmt != nil {
+		if cerr := q.deleteTrendingPostsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteTrendingPostsStmt: %w", cerr)
+		}
+	}
+	if q.deleteTrendingUsersStmt != nil {
+		if cerr := q.deleteTrendingUsersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteTrendingUsersStmt: %w", cerr)
 		}
 	}
 	if q.getAdminStmt != nil {
@@ -238,6 +257,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing likeTrendingUsersStmt: %w", cerr)
 		}
 	}
+	if q.updateCommentsStmt != nil {
+		if cerr := q.updateCommentsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateCommentsStmt: %w", cerr)
+		}
+	}
 	if q.updateRatingStmt != nil {
 		if cerr := q.updateRatingStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateRatingStmt: %w", cerr)
@@ -297,6 +321,8 @@ type Queries struct {
 	createPollsStmt               *sql.Stmt
 	createStoriesStmt             *sql.Stmt
 	deleteExpiredTokensStmt       *sql.Stmt
+	deleteTrendingPostsStmt       *sql.Stmt
+	deleteTrendingUsersStmt       *sql.Stmt
 	getAdminStmt                  *sql.Stmt
 	getFeedbackStmt               *sql.Stmt
 	getFollowersCountStmt         *sql.Stmt
@@ -317,6 +343,7 @@ type Queries struct {
 	insertTrendingUsersStmt       *sql.Stmt
 	likeTrendingStmt              *sql.Stmt
 	likeTrendingUsersStmt         *sql.Stmt
+	updateCommentsStmt            *sql.Stmt
 	updateRatingStmt              *sql.Stmt
 	upsertPostRecommendationsStmt *sql.Stmt
 	upsertUserRecommendationsStmt *sql.Stmt
@@ -331,6 +358,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createPollsStmt:               q.createPollsStmt,
 		createStoriesStmt:             q.createStoriesStmt,
 		deleteExpiredTokensStmt:       q.deleteExpiredTokensStmt,
+		deleteTrendingPostsStmt:       q.deleteTrendingPostsStmt,
+		deleteTrendingUsersStmt:       q.deleteTrendingUsersStmt,
 		getAdminStmt:                  q.getAdminStmt,
 		getFeedbackStmt:               q.getFeedbackStmt,
 		getFollowersCountStmt:         q.getFollowersCountStmt,
@@ -351,6 +380,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		insertTrendingUsersStmt:       q.insertTrendingUsersStmt,
 		likeTrendingStmt:              q.likeTrendingStmt,
 		likeTrendingUsersStmt:         q.likeTrendingUsersStmt,
+		updateCommentsStmt:            q.updateCommentsStmt,
 		updateRatingStmt:              q.updateRatingStmt,
 		upsertPostRecommendationsStmt: q.upsertPostRecommendationsStmt,
 		upsertUserRecommendationsStmt: q.upsertUserRecommendationsStmt,
