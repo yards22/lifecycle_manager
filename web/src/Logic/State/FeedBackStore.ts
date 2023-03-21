@@ -15,9 +15,12 @@ export class FeedBackStore{
     }
 
     @action
-    SetFeedBack = (x:MFeedBack[])=>{
-        this.feedbackArray = x;
-    }
+    SetFeedbackArray = (x: MFeedBack[] | null) => {
+      if (x !== null){
+        this.feedbackArray = x
+      }
+    };
+
 
     @action
     SetIsLoading = (loading : boolean) =>{
@@ -26,14 +29,26 @@ export class FeedBackStore{
 
     @action
     GetFeedBacks = async ()=> {
-        this.SetIsLoading(true)
-        try{
-            let x = await this.feedBackRepo.getFeedBacks();
-            if(x) this.SetFeedBack(x);
-        }catch(e){
-            throw e;
-        }finally{
-            this.SetIsLoading(false)
-        }
+    try {
+      const feedback:any = await this.feedBackRepo.getFeedBacks( this.token || "");
+      console.log(feedback)
+      this.SetFeedbackArray(feedback.feedback);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  @action
+  PostFeedBackComments = async(status : boolean, comment:string | null,idx :number)=>{
+    try{
+      const feedbacks = this.feedbackArray.map((v) => v);
+      console.log(feedbacks)
+      const res = await this.feedBackRepo.postFeedbackComments(status,comment,idx,this.token || "")
+      feedbacks[idx-2].comment  = comment;
+      feedbacks[idx-2].status = status;
+    }
+    catch(err){
+      throw err;
     }
    }
+}
