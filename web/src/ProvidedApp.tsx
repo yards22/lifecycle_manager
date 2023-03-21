@@ -28,7 +28,7 @@ function ProvidedApp(props:ProvidedAppProps) {
   const rq = new Request({});
   const appStore = new AppStore();
   const authStore = new AuthStore(new AuthRepo(BASE_URL,rq))
-  const feedBackStore = new FeedBackStore(new FeedBackRepo(BASE_URL+"/feedback",rq))
+  const feedBackStore = new FeedBackStore(new FeedBackRepo(BASE_URL+"/feedback",BASE_URL_FOR_IMAGES,rq))
   const pollsStore = new PollsStore(new PollsRepo(BASE_URL+"/poll",rq))
 
   return (
