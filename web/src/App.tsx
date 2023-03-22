@@ -10,6 +10,9 @@ import TopBar from "./Organs/Navbar/TopBar/TopBar";
 import BottomBar from "./Organs/Navbar/BottomBar";
 import LoginScreenIndex from "./Screens/LoginScreen/Index";
 import ProtectedRoutes from "./ProtectedRoutes";
+import AnalyticsScreenIndex from "./Screens/AnalyticsScreen";
+import TemplatesScreenIndex from "./Screens/TemplateScreen";
+import ProfileScreenIndex from "./Screens/ProfileScreen";
 
 
 const SApp = styled.section`
@@ -55,15 +58,18 @@ function App() {
           const {appStore,authStore} = store;
           return(
             <Router>
-              <SApp>
-              { authStore.isUserLoggedIn && appStore.isPhone && <BottomBar/>}
+              <SApp >
               { authStore.isUserLoggedIn && <TopBar/>}
+              { authStore.isUserLoggedIn && appStore.isPhone && <BottomBar/>}
                  <Routes>
                   <Route path="/login" element={<LoginScreenIndex/>}/>
                       <Route element={<ProtectedRoutes/>}>
                         <Route path="/feedback" element={<FeedBackScreenIndex/>}/>
                         <Route path="/polls" element={<PollsScreenIndex/>}/>
                         <Route path="/stories" element={<StoriesScreenIndex/>}/>
+                        <Route path="/analytics" element={<AnalyticsScreenIndex/>}/>
+                        <Route path="/templates" element={<TemplatesScreenIndex/>}/>
+                        <Route path="/profile" element={<ProfileScreenIndex/>}/>
                         <Route path="*" element={<Navigate to={"/feedback"}/>} />
                       </Route>
                  </Routes>
