@@ -30,7 +30,9 @@ export class FeedBackStore{
     @action
     GetFeedBacks = async ()=> {
     try {
-      const feedback:any = await this.feedBackRepo.getFeedBacks( this.token || "");
+
+      this.token = window.localStorage.getItem("token");
+      const feedback  = await this.feedBackRepo.getFeedBacks( this.token || "");
       console.log(feedback)
       this.SetFeedbackArray(feedback.feedback);
     } catch (err) {
