@@ -2,7 +2,7 @@ import { stringify } from "querystring";
 import { MFeedBack } from "../Modal/MFeedBack";
 import {Request} from "../Utils/Fetch"
 import { CheckResponse } from "../Utils/ResponseHandler";
-import { AuthHeaders, AuthHeadersWithoutToken } from "../Utils/AuthHeaders";
+import { AuthHeaders, AuthHeadersWithToken, AuthHeadersWithoutToken } from "../Utils/AuthHeaders";
 
 export class FeedBackRepo{
     rq : Request;
@@ -17,7 +17,7 @@ export class FeedBackRepo{
 
     async getFeedBacks(token:string){
         try{
-            const res = await this.rq.Get(`${this.baseUrl}`,AuthHeaders(token));
+            const res = await this.rq.Get(`${this.baseUrl}`,AuthHeadersWithToken(token));
             const {body} = await CheckResponse(res,201)
             const rawFeedBack = body.data as MFeedBack[]
             const finalFeedBacks: MFeedBack[] = [];
