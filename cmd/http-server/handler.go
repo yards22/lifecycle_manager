@@ -7,6 +7,7 @@ import (
 )
 
 func initHandler(app *App, r *chi.Mux) {
+	r.Post("/me", app.handleMe)
 	r.Post("/sendOTP", app.handleSendOTP)
 	r.Post("/login", app.handleLogin)
 	r.Delete("/logout", app.checkAllowance(http.HandlerFunc(app.handleLogout)))
