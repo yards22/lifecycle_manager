@@ -39,6 +39,7 @@ export class AuthStore{
     @action
     PerformLogout = async ()=>{
         try{
+            this.isLoading = true;
             const res = await this.authRepo.Logout(this.token||"")
             if( res!==401) {
                 this.SetToken(null);
@@ -47,6 +48,9 @@ export class AuthStore{
         }
         catch(e){
           console.log(e);
+        }
+        finally{
+            this.isLoading = false
         }
     };
 
@@ -63,7 +67,7 @@ export class AuthStore{
     @action
     VerifyAuthOTP = async (mail_id: string, OTP:string)=>{
         try{
-            console.log(mail_id,OTP)
+            this.isLoading = true
             const response = await this.authRepo.verifyAuthOTP(mail_id,OTP) 
             this.SetToken(response.data.token)
             this.SetIsUserLoggedIn(true)
@@ -71,6 +75,9 @@ export class AuthStore{
             return response.status
         }catch(e){
             console.log(e)
+        }
+        finally{
+            this.isLoading = false
         }
     }
 

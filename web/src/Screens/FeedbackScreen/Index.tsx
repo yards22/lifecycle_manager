@@ -20,6 +20,8 @@ const SFeedBackScreenIndex = styled.div`
 function FeedBackScreenIndex() {
   const stores = useStores();
 
+  console.log("here at feedback screen")
+
   useEffect(() => {
     stores.feedBackStore.GetFeedBacks();
   }, []);
