@@ -6,11 +6,11 @@ import { Navigate, useNavigate } from 'react-router-dom'
 
 const SLoginScreenIndex = styled.div`
     display: flex;
+    flex-direction: column;
     width: 100%;
     height: 100%;
     justify-content: center;
     align-items: center;
-
 `
 
 const AUTH_INITIAL = 0;
@@ -103,8 +103,11 @@ useEffect(() => {
   } else if (authStage === CHECKED_AUTH_LOGGED_IN)
     return <Navigate to="/feedback" />;
 
+    
+
   return (
-    <SLoginScreenIndex>
+    <SLoginScreenIndex >
+      <h2>Admin Portal 22yardz</h2>
        <Card
          shadow="sm" 
          p="lg" 
@@ -130,7 +133,7 @@ useEffect(() => {
                 onChange={handleOTPChange} 
                 style={{minWidth : "250px", marginBottom:"15px"}} 
               />
-              <Button onClick={handleVerifyOTP}>Verify OTP</Button>
+              <Button loading={store.authStore.isLoading} onClick={handleVerifyOTP}>Verify OTP</Button>
             </>
           }
        </Card>
