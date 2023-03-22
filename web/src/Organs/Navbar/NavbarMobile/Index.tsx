@@ -55,13 +55,13 @@ function NavBarMobile({setIsNavBarOpened}:INavBarMobile) {
                       : "gray",
                 }}
                 onClick={() => {
-                  navigate("/feedback");
+                  navigate("/analytics");
                   appStore.setNavigationState(0);
                   setIsNavBarOpened(false)
                 }}
               >
                 {/* <Home size={"25"} /> */}
-                <Text style={{fontSize : "20px"}} ml={"sm"}>Feedbacks</Text>
+                <Text style={{fontSize : "20px"}} ml={"sm"}>Analytics</Text>
               </SMobileBar>
               <SMobileBar
                 theme={{
@@ -71,13 +71,13 @@ function NavBarMobile({setIsNavBarOpened}:INavBarMobile) {
                       : "gray",
                 }}
                 onClick={() => {
-                  navigate("/polls");
+                  navigate("/profile");
                   appStore.setNavigationState(1);
                   setIsNavBarOpened(false)
                 }}
               >
                 {/* <Home size={"25"} /> */}
-                <Text style={{fontSize : "20px"}} ml={"sm"}>Polls</Text>
+                <Text style={{fontSize : "20px"}} ml={"sm"}>Profile</Text>
               </SMobileBar>
               <SMobileBar
                 theme={{
@@ -87,13 +87,13 @@ function NavBarMobile({setIsNavBarOpened}:INavBarMobile) {
                       : "gray",
                 }}
                 onClick={() => {
-                  navigate("/comingSoon");
+                  navigate("/templates");
                   appStore.setNavigationState(2);
                   setIsNavBarOpened(false)
                 }}
               >
                 {/* <Home size={"25"} /> */}
-                <Text style={{fontSize : "20px"}} ml={"sm"}>Stories</Text>
+                <Text style={{fontSize : "20px"}} ml={"sm"}>Templates</Text>
               </SMobileBar>
            </SNavBarMobile>
           )
