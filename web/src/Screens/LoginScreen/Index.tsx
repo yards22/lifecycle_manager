@@ -25,14 +25,12 @@ function LoginScreenIndex() {
   const [authStage,setAuthStage] = useState(CHECKING_AUTH);
   const [currentState , setCurrentState] = useState(1)
 
-  console.log(store.authStore.userMailId,store.authStore.token)
 
 useEffect(()=>{
   if (
     !store.authStore.userMailId &&
     (store.authStore.token == null || store.authStore.token === "")
   ){
-    console.log("mailId absent && token absent")
     setAuthStage(AUTH_INITIAL);
   }
   else if (store.authStore.token) {
@@ -87,7 +85,6 @@ useEffect(() => {
        
     }
   }
-  console.log("in auth stage",authStage)
 
   if (authStage === CHECKING_AUTH) {
     return (
