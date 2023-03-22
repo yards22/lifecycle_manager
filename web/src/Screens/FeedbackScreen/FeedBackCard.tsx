@@ -68,7 +68,7 @@ function FeedBackCard(props: IFeedBackCard) {
             alignItems: "center",
           }}
         >
-         <Text fs="italic">@gmail.com</Text>
+         <Text fs="italic">#{props.feedBack.feedback_id}</Text>
         </div>
         <Title
             order={6}
