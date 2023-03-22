@@ -35,8 +35,8 @@ type LoginArgs struct {
 	OTP    string `json:"otp"`
 }
 type InsertAdminParams struct {
-	MailID string `json:"mail_id"`
-	OpenTo string `json:"open_to"`
+	MailID string   `json:"mail_id"`
+	OpenTo []string `json:"open_to"`
 }
 
 type RegisterRoleArgs struct {
@@ -118,13 +118,14 @@ func (as *AuthService) PerformLogout(ctx context.Context, token string) {
 	as.kv.Delete("admin_" + token)
 }
 
-func (as *AuthService) CheckSession(ctx context.Context, token string) []string {
+func (as *AuthService) CheckSession(ctx context.Context, token string) InsertAdminParams {
 	data := as.kv.Get("admin_" + token)
 	fmt.Println("checkSession data ", data)
+	var params InsertAdminParams
 	if data != uuid.Nil.String() {
-		open_to := strings.Split(data, " ")[2]
-		categories := strings.Split(open_to, "/")
-		return categories
+		open_to := strings.Split(data, " ")[3]
+		params.MailID = strings.Split(data, " ")[2]
+		params.OpenTo = strings.Split(open_to, "/")
 	}
-	return nil
+	return params
 }
