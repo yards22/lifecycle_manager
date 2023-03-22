@@ -28,4 +28,28 @@ export class AuthRepo{
             console.log(e)
         }
     }
+
+    async Logout(token:string){
+        try{
+           const res = await this.rq.Delete( `${this.baseUrl}/logout`,
+           {},
+           { Authorization: `Bearer ${token}` })
+           return res.status
+        }
+        catch(e){
+          console.log(e)
+        }
+    }
+
+    async me(token:string){
+        try{
+            // will get mail id as resposne body
+           const res = await this.rq.Post(this.baseUrl+"/me",token,AuthHeadersWithoutToken());
+           const response = await res.json();
+           return response
+        }
+        catch(err){
+            console.log(err);
+        }
+    }
 }
