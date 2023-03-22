@@ -1,4 +1,4 @@
-import { Burger, Title, useMantineTheme } from '@mantine/core';
+import { Burger, Loader, Title, useMantineTheme } from '@mantine/core';
 import { Observer } from 'mobx-react-lite';
 import React, { useState } from 'react'
 import { LogOut, Search } from 'react-feather';
@@ -11,7 +11,21 @@ function TopBarMobile() {
     const mantineTheme = useMantineTheme();
     const [isNavBarOpened, setIsNavBarOpened] = useState(false)
     const navigate = useNavigate();
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+    // if(stores.authStore.isLoading)
+    // return (
+    //     <section
+    //     style={{
+    //       height: "100vh",
+    //       width: "100vh",
+    //       display: "flex",
+    //       justifyContent: "center",
+    //       alignItems: "center"
+    //     }}
+    //   >
+    //     <Loader variant="bars" size={"sm"} />
+    //   </section>
+    // )
     
     return (
         <Observer>
@@ -20,31 +34,38 @@ function TopBarMobile() {
         return(
             <div
             style={{
-                background: mantineTheme.colors[mantineTheme.primaryColor][6],
-                position: "fixed",
-                top: "0",
-                left: "0",
-                zIndex: "100",
-                right: "0",
-                height: "60px",
-                width: "100%",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+              background: mantineTheme.colors[mantineTheme.primaryColor][6],
+              position: "fixed",
+              top: "0",
+              left: "0",
+              zIndex: "100",
+              right: "0",
+              height: "60px",
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
             }}
-            >
-            <Burger 
-                opened={isNavBarOpened}
-                color = {'white'}
-                onClick = {()=>{setIsNavBarOpened(!isNavBarOpened)}}
+          >
+            <Burger
+              opened={isNavBarOpened}
+              color={"white"}
+              style={{
+                position: "absolute",
+                left: "13px"
+              }}
+              onClick={() => {
+                setIsNavBarOpened(!isNavBarOpened);
+              }}
             />
-            <Title color={"white"} order={5}>
-                Admin 22 Yards 
-            </Title>
+            <h3 style={{color:"white"}}>22 Yardz Admin</h3>
             <LogOut
-                color = {'white'}
+                style={{
+                    position: "absolute",
+                    right: "13px",
+                    color: "white"
+                }}
                 onClick = {()=>{
-                    console.log("h")
                     stores.authStore.PerformLogout().then(
                         ()=>{
                             navigate( "/login")
@@ -53,11 +74,15 @@ function TopBarMobile() {
                             throw e
                         })
                 }}
-             />
-            { isNavBarOpened && <NavBarMobile setIsNavBarOpened={setIsNavBarOpened}/> }
-            </div>
+            />
+            {isNavBarOpened && (
+              <NavBarMobile
+                setIsNavBarOpened={(x: boolean) => setIsNavBarOpened(x)}
+              />
+            )}
+          </div>
         )
-        }}
+    }}
         </Observer>
     )
 }
