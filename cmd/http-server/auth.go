@@ -18,6 +18,11 @@ type UserDetails struct {
 	MailId   string
 }
 
+type LoginRes struct {
+	Token  string `json:"token"`
+	MailId string `json:"mail_id"`
+}
+
 type Stories struct{}
 
 type Token struct{}
@@ -76,6 +81,15 @@ func (app *App) handleAddRole(rw http.ResponseWriter, r *http.Request) {
 	sendErrorResponse(rw, http.StatusUnauthorized, nil, "secret_invalid")
 }
 
+func (app *App) handleMe(rw http.ResponseWriter, r *http.Request) {
+	var incBody string
+	err := getBody(r, &incBody)
+	if err != nil {
+		fmt.Println(err)
+	}
+	params := app.authService.CheckSession(r.Context(), incBody)
+	sendResponse(rw, http.StatusOK, params.MailID, "Check ME")
+}
 func (app *App) handleLogin(rw http.ResponseWriter, r *http.Request) {
 	var incBody authservice.LoginArgs
 	err := getBody(r, &incBody)
@@ -87,18 +101,20 @@ func (app *App) handleLogin(rw http.ResponseWriter, r *http.Request) {
 		sendErrorResponse(rw, http.StatusBadRequest, nil, "inputs creds missing")
 		return
 	}
-
-	token := app.authService.PerformLogin(r.Context(), incBody)
-	if token == uuid.Nil.String() {
+	var res LoginRes
+	res.Token = app.authService.PerformLogin(r.Context(), incBody)
+	if res.Token == uuid.Nil.String() {
 		sendErrorResponse(rw, http.StatusBadRequest, nil, "inputs creds are not matching")
 		return
 	}
-	sendResponse(rw, http.StatusOK, token, "Logged in succesfully")
+	res.MailId = incBody.MailId
+	sendResponse(rw, http.StatusOK, res, "Logged in succesfully")
 
 }
 
 func (app *App) handleLogout(rw http.ResponseWriter, r *http.Request) {
-	token := r.Context().Value(Token{}).(string)
+
+	token := (r.Context().Value("user")).(UserDetails).Token
 	fmt.Println(token)
 	app.authService.PerformLogout(r.Context(), token)
 	sendResponse(rw, http.StatusOK, nil, "Logged out successfully")
@@ -109,22 +125,24 @@ func (app *App) checkAllowance(next http.Handler) http.HandlerFunc {
 
 		authHeader := r.Header.Get("Authorization")
 		token := BearerAuthHeader(authHeader)
+		fmt.Println(token)
 		if token != "" {
-			categories := app.authService.CheckSession(r.Context(), token)
-			if categories != nil {
+			params := app.authService.CheckSession(r.Context(), token)
+			fmt.Println(params)
+			if params.OpenTo != nil {
 				var newCtx context.Context
 				var x UserDetails
-				x.MailId = categories[0]
+				x.MailId = params.MailID
 				x.Token = token
-				for i := 1; i < len(categories); i++ {
+				for i := 0; i < len(params.OpenTo); i++ {
 
-					if categories[i] == "polls" {
+					if params.OpenTo[i] == "polls" {
 						x.Polls = true
 					}
-					if categories[i] == "stories" {
+					if params.OpenTo[i] == "stories" {
 						x.Stories = true
 					}
-					if categories[i] == "feedback" {
+					if params.OpenTo[i] == "feedback" {
 						x.Feedback = true
 					}
 				}
@@ -134,6 +152,7 @@ func (app *App) checkAllowance(next http.Handler) http.HandlerFunc {
 				return
 			}
 		}
+		fmt.Println("here at unauthorized")
 		sendErrorResponse(rw, http.StatusUnauthorized, nil, "unauthorized_user")
 	})
 }
