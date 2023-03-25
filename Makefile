@@ -14,7 +14,7 @@ lcm:
 	make beb
 
 feb:
-	cd web && yarn && yarn build && cp -r build ../app/
+	cd web && yarn && yarn build && copy -r build ..\app\	
 
 beb:
 	go build -o app/api cmd/http-server/*.go
