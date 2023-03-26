@@ -135,7 +135,6 @@ func (app *App) checkAllowance(next http.Handler) http.HandlerFunc {
 				x.MailId = params.MailID
 				x.Token = token
 				for i := 0; i < len(params.OpenTo); i++ {
-
 					if params.OpenTo[i] == "polls" {
 						x.Polls = true
 					}

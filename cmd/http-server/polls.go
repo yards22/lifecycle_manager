@@ -38,7 +38,7 @@ func (app *App) handleGetPoll(rw http.ResponseWriter, r *http.Request) {
 	if x.Polls {
 
 		polls := app.PollManager.Get(r.Context())
-		sendResponse(rw, http.StatusCreated, polls, "polls_section")
+		sendResponse(rw, http.StatusOK, polls, "polls_section")
 		return
 	}
 
