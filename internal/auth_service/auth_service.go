@@ -64,10 +64,10 @@ func (as *AuthService) PerformMailIdCheck(ctx context.Context, arg SendOTPArgs) 
 		otp := util.GenerateRandom(6)
 		err := as.kv.Set("admin_otp_"+otp, arg.MailId)
 		fmt.Println(err)
-		// err = as.mailer.Send("22Yardz Admin", arg.MailId, "OTP Verification", fmt.Sprintf("Your OTP is %s.", otp))
-		// if err != nil {
-		// 	fmt.Println(err)
-		// }
+		err = as.mailer.Send("22Yardz Admin", arg.MailId, "OTP Verification", fmt.Sprintf("Your OTP is %s.", otp))
+		if err != nil {
+			fmt.Println(err)
+		}
 		return otp
 	}
 	return uuid.Nil.String()
@@ -92,7 +92,7 @@ func (as *AuthService) PerformLogin(ctx context.Context, arg LoginArgs) string {
 		for as.kv.Get(token) == "Nil" {
 			token = util.GenerateRandomToken(64)
 		}
-		x := arg.MailId + "/" + categories
+		x := arg.MailId + " " + categories
 		as.kv.Set("admin_"+token, x)
 		return token
 	}
