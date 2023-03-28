@@ -32,26 +32,34 @@ func (q *Queries) CreatePolls(ctx context.Context, arg CreatePollsParams) error 
 }
 
 const getPolls = `-- name: GetPolls :many
-SELECT poll_id, poll_by, poll_question, options_count, options, created_at FROM polls 
-ORDER BY created_at DESC
+select polls.poll_id,polls.poll_question,polls.options_count,polls_reaction.type,count(*) from polls
+inner join polls_reaction on polls.poll_id = polls_reaction.poll_id
+group by polls.poll_id, polls.poll_question, polls.options_count,polls_reaction.type
 `
 
-func (q *Queries) GetPolls(ctx context.Context) ([]*Poll, error) {
+type GetPollsRow struct {
+	PollID       int32  `json:"poll_id"`
+	PollQuestion string `json:"poll_question"`
+	OptionsCount int32  `json:"options_count"`
+	Type         int32  `json:"type"`
+	Count        int64  `json:"count"`
+}
+
+func (q *Queries) GetPolls(ctx context.Context) ([]*GetPollsRow, error) {
 	rows, err := q.query(ctx, q.getPollsStmt, getPolls)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []*Poll{}
+	items := []*GetPollsRow{}
 	for rows.Next() {
-		var i Poll
+		var i GetPollsRow
 		if err := rows.Scan(
 			&i.PollID,
-			&i.PollBy,
 			&i.PollQuestion,
 			&i.OptionsCount,
-			&i.Options,
-			&i.CreatedAt,
+			&i.Type,
+			&i.Count,
 		); err != nil {
 			return nil, err
 		}

@@ -24,7 +24,7 @@ type Querier interface {
 	GetFollowingReaction(ctx context.Context, followerID int32) ([]*GetFollowingReactionRow, error)
 	GetFollwers(ctx context.Context, dateSUB interface{}) ([]*GetFollwersRow, error)
 	GetMutual(ctx context.Context, followerID int32) ([]int32, error)
-	GetPolls(ctx context.Context) ([]*Poll, error)
+	GetPolls(ctx context.Context) ([]*GetPollsRow, error)
 	GetPosts(ctx context.Context, dateSUB interface{}) ([]*GetPostsRow, error)
 	GetRating(ctx context.Context, userID int32) (int32, error)
 	GetStories(ctx context.Context) ([]*Story, error)
